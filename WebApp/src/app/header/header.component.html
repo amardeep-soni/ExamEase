@@ -1,0 +1,47 @@
+<header class="bg-white shadow-lg">
+    <nav class="container mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+        <!-- Logo -->
+        <div class="flex items-center">
+          <img src="assets/logo.png" alt="Logo" class="h-8 w-auto">
+          <span class="ml-2 text-xl font-bold text-gray-800">Your Brand</span>
+        </div>
+  
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex space-x-8">
+          <a href="#" class="text-gray-600 hover:text-gray-900">Home</a>
+          <a href="#" class="text-gray-600 hover:text-gray-900">About</a>
+          <a href="#" class="text-gray-600 hover:text-gray-900">Services</a>
+          <a href="#" class="text-gray-600 hover:text-gray-900">Contact</a>
+        </div>
+  
+        <!-- Mobile Menu Button -->
+        <button 
+          (click)="toggleMenu()"
+          class="md:hidden text-gray-600 hover:text-gray-900 focus:outline-none"
+        >
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path 
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              stroke-width="2" 
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+      </div>
+  
+      <!-- Mobile Navigation -->
+      <div 
+        [ngClass]="{'hidden': !isMenuOpen}"
+        class="md:hidden mt-2"
+      >
+        <div class="flex flex-col space-y-3 py-3">
+          <a href="#" class="text-gray-600 hover:text-gray-900">Home</a>
+          <a href="#" class="text-gray-600 hover:text-gray-900">About</a>
+          <a href="#" class="text-gray-600 hover:text-gray-900">Services</a>
+          <a href="#" class="text-gray-600 hover:text-gray-900">Contact</a>
+        </div>
+      </div>
+    </nav>
+  </header>
