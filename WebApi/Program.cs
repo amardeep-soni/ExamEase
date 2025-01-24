@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using WebApi.Repositories;
 using WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using WebApi.Model;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +53,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IExamScheduleRepository, ExamRepository>();
 
 // Add JWT authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
