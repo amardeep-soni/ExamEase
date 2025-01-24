@@ -81,6 +81,12 @@ builder.Services.AddCors(options =>
         });
 });
 
+// Add environment-specific configuration (production settings)
+if (builder.Environment.IsProduction())
+{
+    builder.Configuration.AddJsonFile("appsettings.Production.json", optional: false, reloadOnChange: true);
+}
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
