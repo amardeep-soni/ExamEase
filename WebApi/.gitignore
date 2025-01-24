@@ -34,3 +34,4 @@ msbuild.wrn
 .vs/
 /appsettings.Development.json
 /appsettings.Production.json
+/.editorconfig

@@ -18,8 +18,6 @@ namespace WebApi.Controllers
 
         [Authorize]
         [HttpGet("profile")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<User>> GetCurrentUser()
         {
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
@@ -35,8 +33,6 @@ namespace WebApi.Controllers
 
         [Authorize]
         [HttpPut("profile")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<User>> UpdateCurrentUser([FromBody] UpdateUserDto updateDto)
         {
             try
