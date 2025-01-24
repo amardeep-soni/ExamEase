@@ -6,20 +6,73 @@ using WebApi.Repositories;
 using WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using WebApi.Model;
-
+using Microsoft.Extensions.Options;
+using Microsoft.KernelMemory.MemoryDb.SQLServer;
+using Microsoft.KernelMemory;
+using Microsoft.SemanticKernel;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+// Retrieve the OpenAI API settings from configuration
+var openAIConfig = builder.Configuration.GetSection("OpenAi");
+
+// Add this near the top of your service configuration
+builder.Services.Configure<OpenAIOptions>(
+    builder.Configuration.GetSection("OpenAi"));
+
+// Register Semantic Kernel
+builder.Services.AddTransient<Kernel>(serviceProvider =>
+{
+    var options = serviceProvider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+    var kernel = Kernel.CreateBuilder()
+        .AddOpenAIChatCompletion(options.ChatModelId, options.ApiKey)
+        .Build();
+
+    return kernel;
+});
+
+builder.Services.AddSingleton<IKernelMemory>(sp =>
+{
+    var options = sp.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+    IKernelMemoryBuilder kmBuilder = new KernelMemoryBuilder();
+
+    var memory = kmBuilder
+        .WithOpenAITextEmbeddingGeneration(new OpenAIConfig 
+        { 
+            EmbeddingModel = options.EmbeddingModelId, 
+            APIKey = options.ApiKey 
+        })
+        .WithOpenAITextGeneration(new OpenAIConfig 
+        { 
+            TextModel = options.ChatModelId, 
+            APIKey = options.ApiKey 
+        })
+        .WithSqlServerMemoryDb(new SqlServerConfig
+        {
+            ConnectionString = connectionString,
+            EmbeddingsTableName = "KM_Embedding",
+            MemoryCollectionTableName = "KM_Collection", 
+            MemoryTableName = "KM_Memory",
+            Schema = "dbo",
+            TagsTableName = "KM_Tag",
+        })
+        .Build<MemoryServerless>(new KernelMemoryBuilderBuildOptions { AllowMixingVolatileAndPersistentData = true });
+
+    return memory;
+});
+
+builder.Services.AddScoped<AIService>();
+
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
 
-    // Add security definition
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -30,7 +83,6 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Enter 'Bearer' [space] and then your valid JWT token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\""
     });
 
-    // Add security requirement
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -42,7 +94,7 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
     });
 });
@@ -55,7 +107,6 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IExamScheduleRepository, ExamRepository>();
 
-// Add JWT authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -74,16 +125,13 @@ builder.Services.AddCors(options =>
         builder =>
         {
             builder
-                .WithOrigins(
-                    "http://localhost:4200"
-                )
+                .WithOrigins("http://localhost:4200")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials();
         });
 });
 
-// Add environment-specific configuration (production settings)
 if (builder.Environment.IsProduction())
 {
     builder.Configuration.AddJsonFile("appsettings.Production.json", optional: false, reloadOnChange: true);
@@ -91,23 +139,14 @@ if (builder.Environment.IsProduction())
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
 app.UseSwagger();
 app.UseSwaggerUI();
-//}
 
 app.UseHttpsRedirection();
-
 app.UseCors("CorsPolicy");
-
 app.UseStaticFiles();
-
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
