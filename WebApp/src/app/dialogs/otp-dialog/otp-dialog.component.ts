@@ -1,24 +1,36 @@
-import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { DynamicDialogRef } from 'primeng/dynamicdialog';
+import { Component, Inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { ServiceProxyModule } from '../../../service-proxies/service-proxy.module';
+import { FormsModule, ValueChangeEvent } from '@angular/forms';
+import {
+  AuthServiceProxy,
+  VerifyOtpDto,
+} from '../../../service-proxies/service-proxies';
 
 @Component({
   selector: 'app-otp-dialog',
-  standalone: true,
-  imports: [CommonModule, DialogModule, ButtonModule, InputTextModule],
   templateUrl: './otp-dialog.component.html',
-  styleUrl: './otp-dialog.component.css',
+  styleUrls: ['./otp-dialog.component.css'],
+  imports: [FormsModule, ServiceProxyModule, CommonModule],
 })
 export class OtpDialogComponent {
-  dialogRef = inject(DynamicDialogRef);
   otpValues: string[] = new Array(6).fill('');
   isOtpValid = false;
   isVerifying = false;
   resendDisabled = false;
   resendCountdown = 0;
+  userEmail: string;
+
+  constructor(
+    public dialogRef: MatDialogRef<OtpDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private _authService: AuthServiceProxy
+  ) {
+    this.userEmail = data.userEmail; // Get the email from the data
+  }
+
+  ngOnInit(): void {}
 
   onOtpChange(event: KeyboardEvent, index: number) {
     const input = event.target as HTMLInputElement;
@@ -85,8 +97,18 @@ export class OtpDialogComponent {
       try {
         // Simulate API call
         await new Promise((resolve) => setTimeout(resolve, 1500));
-        this.dialogRef.close(otp);
-        console.log(otp);
+        VerifyOtpDto;
+        const verifyOtpData = new VerifyOtpDto();
+        verifyOtpData.email = this.userEmail;
+        verifyOtpData.otp = otp;
+
+        this._authService.verifyOtp(verifyOtpData).subscribe((res: any) => {
+          if (res) {
+            this.dialogRef.close(res); // Pass the OTP and email back
+          }
+        });
+        // this.dialogRef.close({ otp, email: this.userEmail }); // Pass the OTP and email back
+        // console.log(otp);
       } catch (error) {
         // Handle error
         console.error('OTP verification failed:', error);

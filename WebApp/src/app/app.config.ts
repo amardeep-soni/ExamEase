@@ -26,6 +26,6 @@ export const appConfig: ApplicationConfig = {
   provideHttpClient(withFetch()),
     BrowserModule,
     BrowserAnimationsModule,
-    ServiceProxyModule,
+    ServiceProxyModule, provideAnimationsAsync(),
   ]
 };

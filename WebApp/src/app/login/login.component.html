@@ -1,79 +1,55 @@
 <div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
-      <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Welcome Back</h2>
-      <form>
-        <!-- Email Field -->
-        <div class="mb-4">
-          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <input
-            type="email"
-            id="email"
-            placeholder="Enter your email"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-          />
-        </div>
-  
-        <!-- Password Field -->
-        <div class="mb-4">
-          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-          <input
-            type="password"
-            id="password"
-            placeholder="Enter your password"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-          />
-        </div>
-  
-        <!-- Remember Me & Forgot Password -->
-        <div class="flex items-center justify-between mb-6">
-          <label class="flex items-center text-sm text-gray-600">
-            <input type="checkbox" class="h-4 w-4 text-blue-600 rounded" />
-            <span class="ml-2">Remember me</span>
-          </label>
-          <a href="#" class="text-sm text-blue-600 hover:underline">Forgot password?</a>
-        </div>
-  
-        <!-- Login Button -->
-        <button
-          type="submit"
-          class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
-        >
-          Sign In
-        </button>
-      </form>
-  
-      <!-- Divider -->
-      <div class="my-6 text-center">
-        <span class="text-sm text-gray-500">or continue with</span>
+  <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Welcome Back</h2>
+    <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)">
+      <!-- Email Field -->
+      <div class="mb-4">
+        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="loginData.email"
+          placeholder="Enter your email"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+          required
+        />
       </div>
-  
-      <!-- Social Login Buttons -->
-      <div class="flex justify-center gap-4">
-        <button
-          class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition duration-200"
-          aria-label="Login with Google"
-        >
-          <img src="assets/google-icon.svg" alt="Google" class="w-5 h-5" />
-        </button>
-        <button
-          class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition duration-200"
-          aria-label="Login with Facebook"
-        >
-          <img src="assets/facebook-icon.svg" alt="Facebook" class="w-5 h-5" />
-        </button>
-        <button
-          class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition duration-200"
-          aria-label="Login with GitHub"
-        >
-          <img src="assets/github-icon.svg" alt="GitHub" class="w-5 h-5" />
-        </button>
+
+      <!-- Password Field -->
+      <div class="mb-4">
+        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [(ngModel)]="loginData.password"
+          placeholder="Enter your password"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+          required
+        />
       </div>
-  
-      <!-- Register Redirect -->
-      <p class="text-sm text-center text-gray-600 mt-6">
-        Don’t have an account?
-        <a href="/register" class="text-blue-600 hover:underline">Sign up</a>
-      </p>
+
+
+      <!-- Login Button -->
+      <button
+        type="submit"
+        class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+      >
+        Sign In
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="my-6 text-center">
+      <span class="text-sm text-gray-500">or continue with</span>
     </div>
+
+ 
+    <!-- Register Redirect -->
+    <p class="text-sm text-center text-gray-600 mt-6">
+      Don’t have an account?
+      <a href="/register" class="text-blue-600 hover:underline">Sign up</a>
+    </p>
   </div>
-  
+</div>

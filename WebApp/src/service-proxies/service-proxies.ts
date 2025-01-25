@@ -18,6 +18,174 @@ import { DateTime, Duration } from "luxon";
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 @Injectable()
+export class AiServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param question (optional) 
+     * @return OK
+     */
+    getAiAnswer(question: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/Ai/GetAiAnswer?";
+        if (question === null)
+            throw new Error("The parameter 'question' cannot be null.");
+        else if (question !== undefined)
+            url_ += "question=" + encodeURIComponent("" + question) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAiAnswer(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAiAnswer(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processGetAiAnswer(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    addDataToMemory(body: AddDataRequest | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/Ai/AddDataToMemory";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddDataToMemory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddDataToMemory(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processAddDataToMemory(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param documentId (optional) 
+     * @return OK
+     */
+    deleteDataFromMemory(documentId: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/Ai/DeleteDataFromMemory?";
+        if (documentId === null)
+            throw new Error("The parameter 'documentId' cannot be null.");
+        else if (documentId !== undefined)
+            url_ += "documentId=" + encodeURIComponent("" + documentId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteDataFromMemory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteDataFromMemory(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDeleteDataFromMemory(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class AuthServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -422,6 +590,295 @@ export class AuthServiceProxy {
 }
 
 @Injectable()
+export class ApiServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    examSchedulePost(body: ExamScheduleRequest | undefined): Observable<ExamScheduleResponse> {
+        let url_ = this.baseUrl + "/api/ExamSchedule";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processExamSchedulePost(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processExamSchedulePost(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ExamScheduleResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ExamScheduleResponse>;
+        }));
+    }
+
+    protected processExamSchedulePost(response: HttpResponseBase): Observable<ExamScheduleResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ExamScheduleResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    examSchedulePut(id: number, body: ExamScheduleRequest | undefined): Observable<ExamScheduleResponse> {
+        let url_ = this.baseUrl + "/api/ExamSchedule/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processExamSchedulePut(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processExamSchedulePut(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ExamScheduleResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ExamScheduleResponse>;
+        }));
+    }
+
+    protected processExamSchedulePut(response: HttpResponseBase): Observable<ExamScheduleResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ExamScheduleResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    examScheduleGet(scheduleId: number): Observable<void> {
+        let url_ = this.baseUrl + "/api/ExamSchedule/{scheduleId}";
+        if (scheduleId === undefined || scheduleId === null)
+            throw new Error("The parameter 'scheduleId' must be defined.");
+        url_ = url_.replace("{scheduleId}", encodeURIComponent("" + scheduleId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processExamScheduleGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processExamScheduleGet(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processExamScheduleGet(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    examScheduleDelete(scheduleId: number): Observable<void> {
+        let url_ = this.baseUrl + "/api/ExamSchedule/{scheduleId}";
+        if (scheduleId === undefined || scheduleId === null)
+            throw new Error("The parameter 'scheduleId' must be defined.");
+        url_ = url_.replace("{scheduleId}", encodeURIComponent("" + scheduleId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processExamScheduleDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processExamScheduleDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processExamScheduleDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class ExamScheduleServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @return OK
+     */
+    byEmail(email: string): Observable<void> {
+        let url_ = this.baseUrl + "/api/ExamSchedule/byEmail/{email}";
+        if (email === undefined || email === null)
+            throw new Error("The parameter 'email' must be defined.");
+        url_ = url_.replace("{email}", encodeURIComponent("" + email));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processByEmail(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processByEmail(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processByEmail(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class UserServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -608,6 +1065,218 @@ export class ServiceProxy {
         }
         return _observableOf(null as any);
     }
+}
+
+export class AddDataRequest implements IAddDataRequest {
+    data!: string | undefined;
+    documentId!: string | undefined;
+
+    constructor(data?: IAddDataRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.data = _data["data"];
+            this.documentId = _data["documentId"];
+        }
+    }
+
+    static fromJS(data: any): AddDataRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddDataRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["data"] = this.data;
+        data["documentId"] = this.documentId;
+        return data;
+    }
+}
+
+export interface IAddDataRequest {
+    data: string | undefined;
+    documentId: string | undefined;
+}
+
+export class ExamScheduleRequest implements IExamScheduleRequest {
+    email!: string | undefined;
+    dailyStudyHours!: number;
+    examDate!: DateTime;
+    examSubjectTimes!: ExamSubjectTimeDto[] | undefined;
+
+    constructor(data?: IExamScheduleRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.email = _data["email"];
+            this.dailyStudyHours = _data["dailyStudyHours"];
+            this.examDate = _data["examDate"] ? DateTime.fromISO(_data["examDate"].toString()) : <any>undefined;
+            if (Array.isArray(_data["examSubjectTimes"])) {
+                this.examSubjectTimes = [] as any;
+                for (let item of _data["examSubjectTimes"])
+                    this.examSubjectTimes!.push(ExamSubjectTimeDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ExamScheduleRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new ExamScheduleRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["email"] = this.email;
+        data["dailyStudyHours"] = this.dailyStudyHours;
+        data["examDate"] = this.examDate ? this.examDate.toString() : <any>undefined;
+        if (Array.isArray(this.examSubjectTimes)) {
+            data["examSubjectTimes"] = [];
+            for (let item of this.examSubjectTimes)
+                data["examSubjectTimes"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IExamScheduleRequest {
+    email: string | undefined;
+    dailyStudyHours: number;
+    examDate: DateTime;
+    examSubjectTimes: ExamSubjectTimeDto[] | undefined;
+}
+
+export class ExamScheduleResponse implements IExamScheduleResponse {
+    id!: number;
+    email!: string | undefined;
+    dailyStudyHours!: number;
+    examDate!: DateTime;
+    createdDate!: DateTime;
+    examSubjectTimes!: ExamSubjectTimeDto[] | undefined;
+
+    constructor(data?: IExamScheduleResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.email = _data["email"];
+            this.dailyStudyHours = _data["dailyStudyHours"];
+            this.examDate = _data["examDate"] ? DateTime.fromISO(_data["examDate"].toString()) : <any>undefined;
+            this.createdDate = _data["createdDate"] ? DateTime.fromISO(_data["createdDate"].toString()) : <any>undefined;
+            if (Array.isArray(_data["examSubjectTimes"])) {
+                this.examSubjectTimes = [] as any;
+                for (let item of _data["examSubjectTimes"])
+                    this.examSubjectTimes!.push(ExamSubjectTimeDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ExamScheduleResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ExamScheduleResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["email"] = this.email;
+        data["dailyStudyHours"] = this.dailyStudyHours;
+        data["examDate"] = this.examDate ? this.examDate.toString() : <any>undefined;
+        data["createdDate"] = this.createdDate ? this.createdDate.toString() : <any>undefined;
+        if (Array.isArray(this.examSubjectTimes)) {
+            data["examSubjectTimes"] = [];
+            for (let item of this.examSubjectTimes)
+                data["examSubjectTimes"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IExamScheduleResponse {
+    id: number;
+    email: string | undefined;
+    dailyStudyHours: number;
+    examDate: DateTime;
+    createdDate: DateTime;
+    examSubjectTimes: ExamSubjectTimeDto[] | undefined;
+}
+
+export class ExamSubjectTimeDto implements IExamSubjectTimeDto {
+    subject!: string | undefined;
+    topicOrChapter!: string[] | undefined;
+    examDateTime!: DateTime;
+
+    constructor(data?: IExamSubjectTimeDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.subject = _data["subject"];
+            if (Array.isArray(_data["topicOrChapter"])) {
+                this.topicOrChapter = [] as any;
+                for (let item of _data["topicOrChapter"])
+                    this.topicOrChapter!.push(item);
+            }
+            this.examDateTime = _data["examDateTime"] ? DateTime.fromISO(_data["examDateTime"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ExamSubjectTimeDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ExamSubjectTimeDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["subject"] = this.subject;
+        if (Array.isArray(this.topicOrChapter)) {
+            data["topicOrChapter"] = [];
+            for (let item of this.topicOrChapter)
+                data["topicOrChapter"].push(item);
+        }
+        data["examDateTime"] = this.examDateTime ? this.examDateTime.toString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IExamSubjectTimeDto {
+    subject: string | undefined;
+    topicOrChapter: string[] | undefined;
+    examDateTime: DateTime;
 }
 
 export class ForgotPasswordDto implements IForgotPasswordDto {

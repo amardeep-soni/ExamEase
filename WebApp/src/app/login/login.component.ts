@@ -1,31 +1,31 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-interface LoginModel {
-  email: string;
-  password: string;
-  rememberMe: boolean;
-}
+import {
+  AuthServiceProxy,
+  LoginDto,
+} from '../../service-proxies/service-proxies';
+import { ServiceProxyModule } from '../../service-proxies/service-proxy.module';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule],
+  imports: [CommonModule, ServiceProxyModule, FormsModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
-  loginData: LoginModel = {
-    email: '',
-    password: '',
-    rememberMe: false
-  };
-
+  loginData: LoginDto = {} as LoginDto;
   isLoading = false;
   showPassword = false;
   errorMessage = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private _authService: AuthServiceProxy,
+    private authService: AuthService
+  ) {}
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
@@ -33,18 +33,27 @@ export class LoginComponent {
 
   async onSubmit(form: NgForm) {
     if (form.valid) {
-      this.isLoading = true;
-      this.errorMessage = '';
+      console.log('Login form data:', this.loginData);
 
       try {
         // Implement your login logic here
         console.log('Login attempt with:', this.loginData);
-        
+        this._authService.login(this.loginData).subscribe((res) => {
+          console.log('Login response:', res);
+          if (res.isError === 'false') {
+            if (res.message) {
+              this.authService.setToken(res.message);
+            } else {
+              this.errorMessage = 'Login failed: No token received';
+            }
+          } else {
+            this.errorMessage = 'Login failed: No token received';
+          }
+          this.router.navigate(['/dashboard']);
+        });
+
         // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        // On success, navigate to dashboard
-        this.router.navigate(['/dashboard']);
+        await new Promise((resolve) => setTimeout(resolve, 1500));
       } catch (error) {
         this.errorMessage = 'Invalid email or password';
       } finally {
@@ -52,6 +61,4 @@ export class LoginComponent {
       }
     }
   }
-
-
 }
