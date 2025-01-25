@@ -15,7 +15,7 @@
       type="text"
       maxlength="1"
       *ngFor="let _ of [1, 2, 3, 4, 5, 6]; let i = index"
-      class="w-14 h-14 text-center text-2xl font-bold rounded-lg shadow-sm transition-all duration-200 focus:shadow-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 appearance-none"
+      class="w-14 h-14 text-center text-2xl font-bold rounded-lg shadow-sm transition-all duration-200 focus:shadow-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 appearance-none border border-gray-300"
       [ngClass]="{ 'border-green-500 ring-2 ring-green-200': otpValues[i] }"
       (keyup)="onOtpChange($event, i)"
       (keydown)="onKeyDown($event, i)"
