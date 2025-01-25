@@ -10,6 +10,8 @@ namespace WebApi.Services
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<ExamScheduleRepository> ExamSchedules { get; set; }
+        public DbSet<ExamSubjectTime> ExamSubjectTimes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -41,6 +43,43 @@ namespace WebApi.Services
                     .HasDefaultValueSql("GETDATE()");
 
                 entity.Property(e => e.UpdatedAt);
+            });
+
+            modelBuilder.Entity<ExamScheduleRepository>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.ExamDate)
+                    .IsRequired();
+
+                entity.Property(e => e.CreatedDate)
+                    .IsRequired()
+                    .HasDefaultValueSql("GETDATE()");
+            });
+
+            modelBuilder.Entity<ExamSubjectTime>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Subject)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.TopicOrChapter)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.ExamDateTime)
+                    .IsRequired();
+
+                entity.HasOne<ExamScheduleRepository>()
+                    .WithMany()
+                    .HasForeignKey(e => e.ExamScheduleId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }
