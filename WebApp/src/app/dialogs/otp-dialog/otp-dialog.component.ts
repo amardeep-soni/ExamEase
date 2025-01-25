@@ -5,6 +5,7 @@ import { ServiceProxyModule } from '../../../service-proxies/service-proxy.modul
 import { FormsModule, ValueChangeEvent } from '@angular/forms';
 import {
   AuthServiceProxy,
+  ForgotPasswordDto,
   VerifyOtpDto,
 } from '../../../service-proxies/service-proxies';
 
@@ -133,6 +134,12 @@ export class OtpDialogComponent {
 
     // Simulate resend API call
     setTimeout(() => {
+      const forgotPasswordDto = new ForgotPasswordDto();
+      forgotPasswordDto.email = this.userEmail;
+      this._authService.resendOtp(forgotPasswordDto).subscribe((res: any) => {
+        console.log(res);
+        console.log('Code resent');
+      });
       console.log('Code resent');
     }, 1000);
   }
