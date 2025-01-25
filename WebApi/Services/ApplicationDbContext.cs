@@ -10,8 +10,9 @@ namespace WebApi.Services
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<ExamScheduleRepository> ExamSchedules { get; set; }
+        public DbSet<ExamSchedule> ExamSchedules { get; set; }
         public DbSet<ExamSubjectTime> ExamSubjectTimes { get; set; }
+        public DbSet<StudyPlan> StudyPlans { get; set; } // Added StudyPlan DbSet
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,10 +46,10 @@ namespace WebApi.Services
                 entity.Property(e => e.UpdatedAt);
             });
 
-            modelBuilder.Entity<ExamScheduleRepository>(entity =>
+            modelBuilder.Entity<ExamSchedule>(entity =>
             {
                 entity.HasKey(e => e.Id);
-                
+
                 entity.Property(e => e.Email)
                     .IsRequired()
                     .HasMaxLength(100);
@@ -76,7 +77,23 @@ namespace WebApi.Services
                 entity.Property(e => e.ExamDateTime)
                     .IsRequired();
 
-                entity.HasOne<ExamScheduleRepository>()
+                entity.HasOne<ExamSchedule>()
+                    .WithMany()
+                    .HasForeignKey(e => e.ExamScheduleId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<StudyPlan>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.ExamScheduleId)
+                    .IsRequired();
+
+                entity.Property(e => e.Plans)
+                    .IsRequired();
+
+                entity.HasOne<ExamSchedule>()
                     .WithMany()
                     .HasForeignKey(e => e.ExamScheduleId)
                     .OnDelete(DeleteBehavior.Cascade);

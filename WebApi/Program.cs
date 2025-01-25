@@ -10,6 +10,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.KernelMemory.MemoryDb.SQLServer;
 using Microsoft.KernelMemory;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+using WebApi.IRepositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +36,14 @@ builder.Services.AddTransient<Kernel>(serviceProvider =>
     return kernel;
 });
 
+// Chat completion service that kernels will use
+builder.Services.AddSingleton<IChatCompletionService>(sp =>
+{
+    OpenAIOptions options = sp.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+
+    return new OpenAIChatCompletionService(options.ChatModelId, options.ApiKey);
+
+});
 builder.Services.AddSingleton<IKernelMemory>(sp =>
 {
     var options = sp.GetRequiredService<IOptions<OpenAIOptions>>().Value;
@@ -106,6 +117,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IExamScheduleRepository, ExamRepository>();
+builder.Services.AddScoped<IStudyPlanRepository, StudyPlanRepository>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

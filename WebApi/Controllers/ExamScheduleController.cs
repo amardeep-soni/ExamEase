@@ -15,14 +15,14 @@ namespace WebApi.Controllers
             _examRepository = examRepository;
         }
 
-        [HttpPost]
+        [HttpPost("CreateExamSchedule")]
         public async Task<ActionResult<ExamScheduleResponse>> CreateExamSchedule([FromBody] ExamScheduleRequest request)
         {
             var result = await _examRepository.CreateOrUpdateExamScheduleAsync(request);
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("UpdateExamSchedule/{id}")]
         public async Task<ActionResult<ExamScheduleResponse>> UpdateExamSchedule(int id, [FromBody] ExamScheduleRequest request)
         {
             try
@@ -36,7 +36,7 @@ namespace WebApi.Controllers
             }
         }
 
-        [HttpGet("{scheduleId}")]
+        [HttpGet("GetExamSchedule/{scheduleId}")]
         public async Task<IActionResult> GetExamSchedule(int scheduleId)
         {
             var result = await _examRepository.GetExamScheduleByIdAsync(scheduleId);
@@ -45,18 +45,19 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpGet("byEmail/{email}")]
-        public async Task<IActionResult> GetExamSchedulesByEmail(string email)
+        [HttpGet("GetExamSchedules")]
+        public async Task<IActionResult> GetExamSchedules()
         {
-            var result = await _examRepository.GetExamSchedulesByEmailAsync(email);
+            var result = await _examRepository.GetExamSchedules();
             return Ok(result);
         }
 
-        [HttpDelete("{scheduleId}")]
+        [HttpDelete("DeleteExamSchedule/{scheduleId}")]
         public async Task<IActionResult> DeleteExamSchedule(int scheduleId)
         {
             await _examRepository.DeleteExamScheduleAsync(scheduleId);
             return NoContent();
         }
+
     }
 }

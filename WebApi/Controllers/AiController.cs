@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WebApi.Dtos;
 using WebApi.Services;
 
 namespace WebApi.Controllers
@@ -34,6 +35,15 @@ namespace WebApi.Controllers
             await _aiService.DeleteDataFromMemory(documentId);
             return Ok();
         }
+
+        [HttpPost("GenerateStudyPlanTask")]
+        public async Task<IActionResult> GenerateStudyPlanTask(ExamScheduleRequest examScheduleRequest)
+        {
+            var result = await _aiService.GenerateStudyPlanTask(examScheduleRequest);
+            return Ok(result);
+        }
+
+
     }
 
     public class AddDataRequest

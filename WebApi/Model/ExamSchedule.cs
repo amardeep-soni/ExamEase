@@ -1,6 +1,6 @@
 ﻿namespace WebApi.Model
 {
-    public class ExamScheduleRepository
+    public class ExamSchedule
     {
         public int Id { get; set; }
         public string Email { get; set; }

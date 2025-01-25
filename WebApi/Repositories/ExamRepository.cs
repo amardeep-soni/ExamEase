@@ -1,5 +1,8 @@
+using System.Security.Claims;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Dtos;
+using WebApi.IRepositories;
 using WebApi.Model;
 using WebApi.Services;
 
@@ -8,15 +11,22 @@ namespace WebApi.Repositories
     public class ExamRepository : IExamScheduleRepository
     {
         private readonly ApplicationDbContext _context;
+        private readonly AIService _aiService;
+        private readonly IStudyPlanRepository _studyPlanRepository;
 
-        public ExamRepository(ApplicationDbContext context)
+        public ExamRepository(
+            ApplicationDbContext context,
+            AIService aiService,
+            IStudyPlanRepository studyPlanRepository)
         {
             _context = context;
+            _aiService = aiService;
+            _studyPlanRepository = studyPlanRepository;
         }
 
         public async Task<ExamScheduleResponse> CreateOrUpdateExamScheduleAsync(ExamScheduleRequest request, int? id = null)
         {
-            var examSchedule = new ExamScheduleRepository();
+            var examSchedule = new ExamSchedule();
 
             if (id.HasValue)
             {
@@ -25,7 +35,7 @@ namespace WebApi.Repositories
                 if (examSchedule == null)
                     throw new KeyNotFoundException($"ExamSchedule with ID {id} not found");
 
-                examSchedule.Email = request.Email;
+                examSchedule.Email = ClaimTypes.Email;
                 examSchedule.DailyStudyHours = request.DailyStudyHours;
                 examSchedule.ExamDate = request.ExamDate;
 
@@ -38,9 +48,9 @@ namespace WebApi.Repositories
             else
             {
                 // Create new schedule
-                examSchedule = new ExamScheduleRepository
+                examSchedule = new ExamSchedule
                 {
-                    Email = request.Email,
+                    Email = ClaimTypes.Email,
                     DailyStudyHours = request.DailyStudyHours,
                     ExamDate = request.ExamDate,
                     CreatedDate = DateTime.UtcNow
@@ -64,6 +74,13 @@ namespace WebApi.Repositories
             await _context.ExamSubjectTimes.AddRangeAsync(examSubjectTimes);
             await _context.SaveChangesAsync();
 
+            // Generate and save study plan if this is a new exam schedule
+            if (!id.HasValue)
+            {
+                var studyPlans = await _aiService.GenerateStudyPlanTask(request);
+                await _studyPlanRepository.CreateStudyPlansAsync(studyPlans, examSchedule.Id);
+            }
+
             return await CreateResponseFromEntities(examSchedule, examSubjectTimes);
         }
 
@@ -82,10 +99,10 @@ namespace WebApi.Repositories
             return await CreateResponseFromEntities(schedule, subjects);
         }
 
-        public async Task<List<ExamScheduleResponse>> GetExamSchedulesByEmailAsync(string email)
+        public async Task<List<ExamScheduleResponse>> GetExamSchedules()
         {
             var schedules = await _context.ExamSchedules
-                .Where(e => e.Email == email)
+                .Where(e => e.Email == ClaimTypes.Email)
                 .ToListAsync();
 
             var responses = new List<ExamScheduleResponse>();
@@ -114,7 +131,7 @@ namespace WebApi.Repositories
             }
         }
 
-        private async Task<ExamScheduleResponse> CreateResponseFromEntities(ExamScheduleRepository schedule, List<ExamSubjectTime> subjects)
+        private async Task<ExamScheduleResponse> CreateResponseFromEntities(ExamSchedule schedule, List<ExamSubjectTime> subjects)
         {
             // Group subjects by Subject and ExamDateTime
             var groupedSubjects = subjects
