@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApi.Dtos;
 using WebApi.Services;
+using System.IO;
 
 namespace WebApi.Controllers
 {
@@ -43,7 +44,36 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
+        [HttpPost("UploadPdfNotes")]
+        public async Task<IActionResult> UploadPdfNotes(IFormFile file, string documentId)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("File is empty.");
 
+            if (Path.GetExtension(file.FileName).ToLower() != ".pdf")
+                return BadRequest("Only PDF files are allowed.");
+
+            using (var stream = file.OpenReadStream())
+            {
+                await _aiService.UploadPdfNotesAsync(stream, documentId);
+            }
+
+            return Ok("PDF notes uploaded successfully.");
+        }
+
+        [HttpGet("AskQuestion")]
+        public async Task<IActionResult> AskQuestion(string question)
+        {
+            var result = await _aiService.AskQuestionAsync(question);
+            return Ok(result);
+        }
+
+        [HttpDelete("DeleteDocumentAsync")]
+        public async Task<IActionResult> DeleteDocumentAsync(string documentId)
+        {
+            await _aiService.DeleteDocumentAsync(documentId);
+            return Ok();
+        }
     }
 
     public class AddDataRequest

@@ -4,11 +4,31 @@ using Microsoft.KernelMemory;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using WebApi.Dtos;
+using System.IO;
+using NetTopologySuite.Utilities;
+using Microsoft.Identity.Client;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace WebApi.Services
 {
-    public class AIService(Kernel _kernel, IKernelMemory _memory, IChatCompletionService _chatCompletionService)
+    public class AIService
     {
+        private readonly Kernel _kernel;
+        private readonly IKernelMemory _memory;
+        private readonly IChatCompletionService _chatCompletionService;
+        private readonly IUserContextService _userContextService;
+
+        public AIService(
+            Kernel kernel,
+            IKernelMemory memory,
+            IChatCompletionService chatCompletionService,
+            IUserContextService userContextService)
+        {
+            _kernel = kernel;
+            _memory = memory;
+            _chatCompletionService = chatCompletionService;
+            _userContextService = userContextService;
+        }
 
         public async Task<string> GetAiAnswer(string question)
         {
@@ -150,6 +170,90 @@ namespace WebApi.Services
 
                 return studyPlan;
             }
+        }
+
+        public async Task UploadPdfNotesAsync(Stream fileStream, string documentId)
+        {
+            var filePath = Path.Combine("wwwroot", $"{documentId}.pdf");
+            using (var fileStreamOutput = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            {
+                await fileStream.CopyToAsync(fileStreamOutput);
+            }
+
+            var tag = new TagCollection();
+            tag.Add("email", _userContextService.GetUserEmail());
+            await _memory.ImportDocumentAsync(filePath, documentId, tags: tag);
+        }
+
+        public async Task<string> GetAiAnswerFromIndex(string question)
+        {
+            var searchResult = await _memory.SearchAsync(
+                question,
+                minRelevance: 0.3,
+                filter: new MemoryFilter().ByTag("email", _userContextService.GetUserEmail())
+            );
+            if (searchResult.NoResult == false)
+            {
+                var found = searchResult.Results[0].Partitions.FirstOrDefault();
+                var documentId = searchResult.Results[0].DocumentId;
+                return found.Text + '~' + documentId;
+            }
+            return "No relevant answer found.";
+        }
+
+        public async Task<ResponseMessage> AskQuestionAsync(string question)
+        {
+            var res = new ResponseMessage();
+            var userEmail = _userContextService.GetUserEmail();
+            var memoryAnswer = await _memory.AskAsync(
+                question,
+                filter: new MemoryFilter().ByTag("email", userEmail),
+                minRelevance: 0.4
+            );
+
+            if (memoryAnswer.NoResult == false)
+            {
+                res.IsError = "false";
+                res.Message = memoryAnswer.Result;
+            }
+            else
+            {
+                var searchResult = await _memory.SearchAsync(
+                    question,
+                    minRelevance: 0.2,
+                    filter: new MemoryFilter().ByTag("email", userEmail)
+                );
+
+                if (searchResult.NoResult == false)
+                {
+                    var allTexts = searchResult.Results.SelectMany(r => r.Partitions).Select(p => p.Text).ToList();
+                    var combinedText = string.Join(" ", allTexts);
+
+                    var chatHistory = new ChatHistory();
+                    chatHistory.AddSystemMessage("You are an AI assistant that helps find the most relevant answer from the provided text. Don't add Extra Text");
+                    chatHistory.AddUserMessage($"Question: {question}\n\nText: {combinedText}");
+
+                    var response = await _chatCompletionService.GetChatMessageContentAsync(
+                        chatHistory: chatHistory,
+                        kernel: _kernel
+                    );
+
+                    res.IsError = "false";
+                    res.Message = response.Content;
+                }
+                else
+                {
+                    res.IsError = "true";
+                    res.Message = "No relevant answer found.";
+                }
+            }
+
+            return res;
+        }
+
+        public async Task DeleteDocumentAsync(string documentId)
+        {
+            await _memory.DeleteDocumentAsync(documentId);
         }
     }
 }
