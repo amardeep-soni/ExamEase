@@ -4,10 +4,14 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   AuthServiceProxy,
+  ForgotPasswordDto,
   LoginDto,
+  ResetPasswordDto,
 } from '../../service-proxies/service-proxies';
 import { ServiceProxyModule } from '../../service-proxies/service-proxy.module';
 import { AuthService } from '../services/auth.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ForgotPasswordDialogComponent } from '../dialogs/forgot-password-dialog/forgot-password-dialog.component';
 
 @Component({
   selector: 'app-login',
@@ -24,7 +28,8 @@ export class LoginComponent {
   constructor(
     private router: Router,
     private _authService: AuthServiceProxy,
-    private authService: AuthService
+    private authService: AuthService,
+    private dialog: MatDialog
   ) {}
 
   togglePasswordVisibility() {
@@ -60,5 +65,20 @@ export class LoginComponent {
         this.isLoading = false;
       }
     }
+  }
+
+  openForgotPasswordDialog() {
+    const dialogRef = this.dialog.open(ForgotPasswordDialogComponent, {
+      width: '450px',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        console.log('Forgot Password email:', result);
+        this._authService.forgotPassword({ email: result } as ForgotPasswordDto).subscribe((res) => {
+          console.log('Reset password response:', res);
+        });
+            }
+    });
   }
 }
