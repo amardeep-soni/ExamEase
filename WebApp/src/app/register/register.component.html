@@ -1,152 +1,181 @@
-<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <!-- Logo/Brand Section -->
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-        Create your account
-      </h2>
-      <p class="mt-2 text-center text-sm text-gray-600">
-        Or
-        <a routerLink="/login" class="font-medium text-indigo-600 hover:text-indigo-500">
-          sign in to your account
-        </a>
-      </p>
-    </div>
-  
-    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-      <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-        <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)" class="space-y-6">
-          <!-- Full Name -->
-          <div>
-            <label for="fullName" class="block text-sm font-medium text-gray-700">
-              Full Name
-            </label>
-            <div class="mt-1">
-              <input
-                id="fullName"
-                name="fullName"
-                type="text"
-                [(ngModel)]="user.fullName"
-                #fullName="ngModel"
-                required
-                minlength="3"
-                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                [ngClass]="{'border-red-500': fullName.invalid && (fullName.dirty || fullName.touched)}"
-              >
-            </div>
-            <div *ngIf="fullName.invalid && (fullName.dirty || fullName.touched)" 
-                 class="mt-1 text-sm text-red-600">
-              <div *ngIf="fullName.errors?.['required']">Full name is required</div>
-              <div *ngIf="fullName.errors?.['minlength']">Full name must be at least 3 characters</div>
-            </div>
-          </div>
-  
-          <!-- Email -->
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">
-              Email address
-            </label>
-            <div class="mt-1">
-              <input
-                id="email"
-                name="email"
-                type="email"
-                [(ngModel)]="user.email"
-                #email="ngModel"
-                required
-                email
-                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                [ngClass]="{'border-red-500': email.invalid && (email.dirty || email.touched)}"
-              >
-            </div>
-            <div *ngIf="email.invalid && (email.dirty || email.touched)" 
-                 class="mt-1 text-sm text-red-600">
-              <div *ngIf="email.errors?.['required']">Email is required</div>
-              <div *ngIf="email.errors?.['email']">Please enter a valid email address</div>
-            </div>
-          </div>
-  
-          <!-- Password -->
-          <div>
-            <label for="password" class="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <div class="mt-1">
-              <input
-                id="password"
-                name="password"
-                type="password"
-                [(ngModel)]="user.password"
-                #password="ngModel"
-                required
-                minlength="6"
-                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                [ngClass]="{'border-red-500': password.invalid && (password.dirty || password.touched)}"
-              >
-            </div>
-            <div *ngIf="password.invalid && (password.dirty || password.touched)" 
-                 class="mt-1 text-sm text-red-600">
-              <div *ngIf="password.errors?.['required']">Password is required</div>
-              <div *ngIf="password.errors?.['minlength']">Password must be at least 6 characters</div>
-            </div>
-          </div>
-  
-          <!-- Confirm Password -->
-          <div>
-            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">
-              Confirm Password
-            </label>
-            <div class="mt-1">
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                [(ngModel)]="user.confirmPassword"
-                #confirmPassword="ngModel"
-                required
-                [pattern]="user.password"
-                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                [ngClass]="{'border-red-500': confirmPassword.invalid && (confirmPassword.dirty || confirmPassword.touched)}"
-              >
-            </div>
-            <div *ngIf="confirmPassword.invalid && (confirmPassword.dirty || confirmPassword.touched)" 
-                 class="mt-1 text-sm text-red-600">
-              <div *ngIf="confirmPassword.errors?.['required']">Confirm password is required</div>
-              <div *ngIf="confirmPassword.errors?.['pattern']">Passwords do not match</div>
-            </div>
-          </div>
-  
-          <!-- Terms and Conditions -->
-          <div class="flex items-center">
+<div
+  class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+>
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <!-- Logo/Brand Section -->
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+      Create your account
+    </h2>
+    <p class="mt-2 text-center text-sm text-gray-600">
+      Or
+      <a
+        routerLink="/login"
+        class="font-medium text-indigo-600 hover:text-indigo-500"
+      >
+        sign in to your account
+      </a>
+    </p>
+  </div>
+
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <form
+        #registerForm="ngForm"
+        (ngSubmit)="onSubmit(registerForm)"
+        class="space-y-6"
+      >
+        <!-- Full Name -->
+        <div>
+          <label for="fullName" class="block text-sm font-medium text-gray-700">
+            Full Name
+          </label>
+          <div class="mt-1">
             <input
-              id="terms"
-              name="terms"
-              type="checkbox"
-              [(ngModel)]="user.terms"
-              #terms="ngModel"
+              id="fullName"
+              name="fullName"
+              type="text"
+              [(ngModel)]="user.fullName"
+              #fullName="ngModel"
               required
-              class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-            >
-            <label for="terms" class="ml-2 block text-sm text-gray-900">
-              I agree to the
-              <a href="#" class="text-indigo-600 hover:text-indigo-500">Terms and Conditions</a>
-            </label>
+              minlength="3"
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              [ngClass]="{
+                'border-red-500':
+                  fullName.invalid && (fullName.dirty || fullName.touched)
+              }"
+            />
           </div>
-          <div *ngIf="terms.invalid && (terms.dirty || terms.touched)" 
-               class="mt-1 text-sm text-red-600">
-            You must accept the terms and conditions
+          <div
+            *ngIf="fullName.invalid && (fullName.dirty || fullName.touched)"
+            class="mt-1 text-sm text-red-600"
+          >
+            <div *ngIf="fullName.errors?.['required']">
+              Full name is required
+            </div>
+            <div *ngIf="fullName.errors?.['minlength']">
+              Full name must be at least 3 characters
+            </div>
           </div>
-  
-          <!-- Submit Button -->
-          <div>
-            <button
-              type="submit"
-              [disabled]="registerForm.invalid"
-              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Register
-            </button>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">
+            Email address
+          </label>
+          <div class="mt-1">
+            <input
+              id="email"
+              name="email"
+              type="email"
+              [(ngModel)]="user.email"
+              #email="ngModel"
+              required
+              email
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              [ngClass]="{
+                'border-red-500':
+                  email.invalid && (email.dirty || email.touched)
+              }"
+            />
           </div>
-        </form>
-      </div>
+          <div
+            *ngIf="email.invalid && (email.dirty || email.touched)"
+            class="mt-1 text-sm text-red-600"
+          >
+            <div *ngIf="email.errors?.['required']">Email is required</div>
+            <div *ngIf="email.errors?.['email']">
+              Please enter a valid email address
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone Number -->
+        <div>
+          <label
+            for="phoneNumber"
+            class="block text-sm font-medium text-gray-700"
+          >
+            Phone Number
+          </label>
+          <div class="mt-1">
+            <input
+              id="phoneNumber"
+              name="phoneNumber"
+              type="tel"
+              [(ngModel)]="user.phoneNumber"
+              #phoneNumber="ngModel"
+              required
+              pattern="^[0-9]{10}$"
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              [ngClass]="{
+                'border-red-500':
+                  phoneNumber.invalid &&
+                  (phoneNumber.dirty || phoneNumber.touched)
+              }"
+              placeholder="1234567890"
+            />
+          </div>
+          <div
+            *ngIf="
+              phoneNumber.invalid && (phoneNumber.dirty || phoneNumber.touched)
+            "
+            class="mt-1 text-sm text-red-600"
+          >
+            <div *ngIf="phoneNumber.errors?.['required']">
+              Phone number is required
+            </div>
+            <div *ngIf="phoneNumber.errors?.['pattern']">
+              Please enter a valid 10-digit phone number
+            </div>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">
+            Password
+          </label>
+          <div class="mt-1">
+            <input
+              id="password"
+              name="password"
+              type="password"
+              [(ngModel)]="user.password"
+              #password="ngModel"
+              required
+              minlength="6"
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              [ngClass]="{
+                'border-red-500':
+                  password.invalid && (password.dirty || password.touched)
+              }"
+            />
+          </div>
+          <div
+            *ngIf="password.invalid && (password.dirty || password.touched)"
+            class="mt-1 text-sm text-red-600"
+          >
+            <div *ngIf="password.errors?.['required']">
+              Password is required
+            </div>
+            <div *ngIf="password.errors?.['minlength']">
+              Password must be at least 6 characters
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+          <button
+            type="submit"
+            [disabled]="registerForm.invalid"
+            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Register
+          </button>
+        </div>
+      </form>
     </div>
   </div>
+</div>
