@@ -1,1 +1,29 @@
-<p>exam-list works!</p>
+<div class="p-4 bg-white text-gray-900 min-h-screen">
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-3xl font-bold">Exam Management</h1>
+    <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600" (click)="addExam()">
+      <i class="fas fa-plus"></i> Add Exam
+    </button>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div *ngFor="let exam of exams" class="bg-gray-100 p-4 rounded-lg shadow-md">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-xl font-semibold">{{ exam.name }}</h2>
+        <div class="flex space-x-2">
+          <button class="text-black hover:text-blue-600" (click)="viewExam(exam)">
+            <i class="fas fa-eye"></i> View Ex
+          </button>
+          <button class="text-black hover:text-yellow-600" (click)="editExam(exam)">
+            <i class="fas fa-pencil-alt"></i>
+            Edit Ex
+          </button>
+          <button class="text-black hover:text-red-600" (click)="deleteExam(exam)">
+            <i class="fas fa-trash"></i>
+            Delete Ex
+          </button>
+        </div>
+      </div>
+      <p class="text-gray-600">{{ exam.date | date: 'mediumDate' }}</p>
+    </div>
+  </div>
+</div>

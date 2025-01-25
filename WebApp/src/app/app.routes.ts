@@ -15,8 +15,4 @@ export const routes: Routes = [
   { path: 'create-exam', component: CreateOrUpdateExamComponent },
 
 
-
-
-
-
 ];

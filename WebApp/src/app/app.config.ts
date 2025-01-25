@@ -11,15 +11,10 @@ import { providePrimeNG } from 'primeng/config';
 import { ServiceProxyModule } from '../service-proxies/service-proxy.module';
 import { AuthInterceptor } from './services/auth.interceptor';
 
-
 export function getRemoteServiceBaseUrl(): string {
-  // let url = (window as any).location.host;
-  // if (url.indexOf("localhost") >= 0) {
-  // return 'https://localhost:44310';
-  // } else {
   return 'https://examease.tryasp.net';
-  // }
 }
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }), 
