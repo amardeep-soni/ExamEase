@@ -12,6 +12,7 @@ import { ServiceProxyModule } from '../../service-proxies/service-proxy.module';
 import { AuthService } from '../services/auth.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ForgotPasswordDialogComponent } from '../dialogs/forgot-password-dialog/forgot-password-dialog.component';
+import { ResetPasswordDialogComponent } from '../dialogs/reset-password-dialog/reset-password-dialog.component';
 
 @Component({
   selector: 'app-login',
@@ -24,6 +25,7 @@ export class LoginComponent {
   isLoading = false;
   showPassword = false;
   errorMessage = '';
+  userEmail: string = '';
 
   constructor(
     private router: Router,
@@ -74,11 +76,45 @@ export class LoginComponent {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
+        this.userEmail = result;
         console.log('Forgot Password email:', result);
-        this._authService.forgotPassword({ email: result } as ForgotPasswordDto).subscribe((res) => {
-          console.log('Reset password response:', res);
-        });
+
+        this._authService
+          .forgotPassword({ email: result } as ForgotPasswordDto)
+          .subscribe((res) => {
+            console.log('Reset password response:', res);
+            if (res.isError === 'false') {
+              this.openResetPasswordDialog();
             }
+          });
+      }
+    });
+  }
+
+  openResetPasswordDialog() {
+    const dialogRef = this.dialog.open(ResetPasswordDialogComponent, {
+      width: '450px',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        console.log('Reset Password data:', result);
+        const resetData = new ResetPasswordDto();
+        resetData.email = this.userEmail;
+        resetData.newPassword = result.newPassword;
+        resetData.code = result.code;
+
+        this._authService
+          .resetPassword(resetData)
+          .subscribe((res) => {
+            console.log('Password reset response:', res);
+            if (res.isError === 'false') {
+              console.log('Password reset successful');
+            } else {
+              console.log('Password reset failed');
+            }
+          });
+      }
     });
   }
 }
