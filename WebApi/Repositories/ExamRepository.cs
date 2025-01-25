@@ -13,15 +13,18 @@ namespace WebApi.Repositories
         private readonly ApplicationDbContext _context;
         private readonly AIService _aiService;
         private readonly IStudyPlanRepository _studyPlanRepository;
+        private readonly IUserContextService _userContextService;
 
         public ExamRepository(
             ApplicationDbContext context,
             AIService aiService,
-            IStudyPlanRepository studyPlanRepository)
+            IStudyPlanRepository studyPlanRepository,
+            IUserContextService userContextService)
         {
             _context = context;
             _aiService = aiService;
             _studyPlanRepository = studyPlanRepository;
+            _userContextService = userContextService;
         }
 
         public async Task<ExamScheduleResponse> CreateOrUpdateExamScheduleAsync(ExamScheduleRequest request, int? id = null)
@@ -35,7 +38,7 @@ namespace WebApi.Repositories
                 if (examSchedule == null)
                     throw new KeyNotFoundException($"ExamSchedule with ID {id} not found");
 
-                examSchedule.Email = ClaimTypes.Email;
+                examSchedule.Email = _userContextService.GetUserEmail();
                 examSchedule.DailyStudyHours = request.DailyStudyHours;
                 examSchedule.ExamDate = request.ExamDate;
 
@@ -44,13 +47,19 @@ namespace WebApi.Repositories
                     .Where(e => e.ExamScheduleId == id.Value)
                     .ToListAsync();
                 _context.ExamSubjectTimes.RemoveRange(existingSubjects);
+
+                // Delete existing study plans
+                var existingStudyPlans = await _context.StudyPlans
+                    .Where(sp => sp.ExamScheduleId == id.Value)
+                    .ToListAsync();
+                _context.StudyPlans.RemoveRange(existingStudyPlans);
             }
             else
             {
                 // Create new schedule
                 examSchedule = new ExamSchedule
                 {
-                    Email = ClaimTypes.Email,
+                    Email = _userContextService.GetUserEmail(),
                     DailyStudyHours = request.DailyStudyHours,
                     ExamDate = request.ExamDate,
                     CreatedDate = DateTime.UtcNow
@@ -74,12 +83,9 @@ namespace WebApi.Repositories
             await _context.ExamSubjectTimes.AddRangeAsync(examSubjectTimes);
             await _context.SaveChangesAsync();
 
-            // Generate and save study plan if this is a new exam schedule
-            if (!id.HasValue)
-            {
-                var studyPlans = await _aiService.GenerateStudyPlanTask(request);
-                await _studyPlanRepository.CreateStudyPlansAsync(studyPlans, examSchedule.Id);
-            }
+            // Generate and save study plan
+            var studyPlans = await _aiService.GenerateStudyPlanTask(request);
+            await _studyPlanRepository.CreateStudyPlansAsync(studyPlans, examSchedule.Id);
 
             return await CreateResponseFromEntities(examSchedule, examSubjectTimes);
         }
@@ -102,7 +108,7 @@ namespace WebApi.Repositories
         public async Task<List<ExamScheduleResponse>> GetExamSchedules()
         {
             var schedules = await _context.ExamSchedules
-                .Where(e => e.Email == ClaimTypes.Email)
+                .Where(e => e.Email == _userContextService.GetUserEmail())
                 .ToListAsync();
 
             var responses = new List<ExamScheduleResponse>();
