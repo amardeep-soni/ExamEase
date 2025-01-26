@@ -1,0 +1,361 @@
+.study-plan-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    min-height: 100vh;
+}
+
+.top-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: #f8f8f8;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.back-button {
+    background: none;
+    border: none;
+    color: #666666;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+}
+
+.back-button:hover {
+    background-color: #eeeeee;
+}
+
+.exam-title {
+    font-size: 1.8rem;
+    color: #333333;
+    font-weight: 600;
+}
+
+.header-controls {
+    display: flex;
+    gap: 1rem;
+}
+
+.header-controls button {
+    background: none;
+    border: none;
+    color: #666666;
+    padding: 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.header-controls button:hover {
+    background-color: #eeeeee;
+}
+
+.tasks-section {
+    background-color: #f8f8f8;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+    margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+    color: #333333;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.date-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    margin-bottom: 20px;
+    background-color: #383838;
+    border-radius: 8px;
+    padding: 15px 20px;
+}
+
+.nav-button {
+    background-color: #2196f3;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 10px 15px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: #1976d2;
+}
+
+.current-date {
+    font-size: 22px;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.task-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.task-card:hover {
+    transform: translateY(-2px);
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.task-header h3 {
+    color: #333333;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.task-date {
+    color: #666666;
+    font-size: 0.9rem;
+}
+
+.task-details {
+    color: #444444;
+    font-size: 1rem;
+}
+
+.task-details p {
+    margin: 0.3rem 0;
+}
+
+.topic-name,
+.time-duration {
+    color: #333333;
+    font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .study-plan-container {
+        padding: 1rem;
+    }
+
+    .top-header {
+        padding: 0.8rem;
+    }
+
+    .exam-title {
+        font-size: 1.5rem;
+    }
+
+    .task-card {
+        padding: 0.8rem;
+    }
+}
+
+.calendar-view {
+    padding: 20px;
+}
+
+.calendar-view .calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.calendar-view .calendar-grid .week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-view .calendar-grid .day {
+    aspect-ratio: 1;
+    border: 1px solid #ddd;
+    padding: 10px;
+    position: relative;
+    cursor: pointer;
+}
+
+.calendar-view .calendar-grid .day:hover {
+    background-color: #f5f5f5;
+}
+
+.calendar-view .calendar-grid .day.has-tasks {
+    background-color: #e3f2fd;
+}
+
+.calendar-view .calendar-grid .day.selected {
+    background-color: #bbdefb;
+}
+
+.calendar-view .calendar-grid .day .date-number {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+
+.calendar-view .calendar-grid .day .task-count {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: #2196f3;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+/* List View Styles */
+.list-view {
+    background-color: #2c2c2c;
+    color: white;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Tasks Container Styles */
+.tasks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.task-item {
+    background-color: #383838;
+    border-radius: 12px;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    transition: transform 0.2s ease;
+}
+
+.task-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.task-item h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #ffffff;
+    grid-column: 1;
+    font-weight: 500;
+}
+
+.task-item p {
+    margin: 5px 0;
+    color: #e0e0e0;
+}
+
+/* Date display */
+.task-item p:first-of-type {
+    grid-column: 2;
+    text-align: right;
+    color: #2196f3;
+}
+
+/* Time display */
+.task-item p:last-of-type {
+    grid-column: 2;
+    text-align: right;
+    color: #e0e0e0;
+}
+
+.no-tasks {
+    text-align: center;
+    color: #9e9e9e;
+    padding: 20px;
+    font-size: 16px;
+    background-color: #383838;
+    border-radius: 8px;
+}
+
+/* Topic style */
+.task-item .topic {
+    grid-column: 1;
+    color: #9e9e9e;
+}
+
+/* View toggle buttons */
+.view-toggle, .calendar-toggle {
+    background-color: #2196f3;
+    border: none;
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.view-toggle:hover, .calendar-toggle:hover {
+    background-color: #1976d2;
+}
+
+/* Header controls */
+.header-controls {
+    display: flex;
+    gap: 10px;
+}
+
+/* Top header */
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #383838;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.exam-title {
+    color: white;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 500;
+}
+
+.back-button {
+    background-color: #2196f3;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #1976d2;
+}
