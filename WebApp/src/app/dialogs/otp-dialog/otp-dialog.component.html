@@ -1,56 +1,57 @@
-<div class="text-center w-full p-5">
-  <h2 class="text-2xl font-bold text-gray-800">Enter Verification Code</h2>
-</div>
-
-<div class="flex flex-col items-center py-4 px-2">
-  <div class="mb-8 text-center">
-    <p class="text-gray-600 text-lg mb-2">Please enter the verification code</p>
-    <p class="text-sm text-gray-500">
-      A 6-digit code has been sent to your device ({{ userEmail }})
-    </p>
-  </div>
-
-  <div class="flex justify-center gap-3 mb-8 w-full mx-2">
-    <input
-      type="text"
-      maxlength="1"
-      *ngFor="let _ of [1, 2, 3, 4, 5, 6]; let i = index"
-      class="w-14 h-14 text-center text-2xl font-bold rounded-lg shadow-sm transition-all duration-200 focus:shadow-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 appearance-none border border-gray-300"
-      [ngClass]="{ 'border-green-500 ring-2 ring-green-200': otpValues[i] }"
-      (keyup)="onOtpChange($event, i)"
-      (keydown)="onKeyDown($event, i)"
-      (paste)="onPaste($event)"
-    />
-  </div>
-
+<div class="p-6">
   <div class="text-center mb-6">
-    <p class="text-sm text-gray-600 mb-2">Didn't receive the code?</p>
-    <button
-      class="text-blue-500 hover:underline"
-      (click)="resendCode()"
-      [disabled]="resendDisabled"
-    >
-      Resend Code
-    </button>
-    <p *ngIf="resendDisabled" class="text-sm text-gray-500">
-      Resend available in {{ resendCountdown }} seconds
-    </p>
+    <h2 class="text-2xl font-bold text-gray-800">Enter Verification Code</h2>
   </div>
-</div>
 
-<div class="flex justify-end gap-3 p-5">
-  <button
-    class="text-gray-500 hover:text-gray-700"
-    (click)="dialogRef.close()"
-  >
-    Cancel
-  </button>
-  <button
-    class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-    [disabled]="!isOtpValid"
-    [class.opacity-50]="isVerifying"
-    (click)="verifyOtp()"
-  >
-    Verify
-  </button>
+  <div class="flex flex-col items-center">
+    <div class="mb-8 text-center">
+      <p class="text-gray-600 text-lg mb-2">Please enter the verification code</p>
+      <p class="text-sm text-gray-500">
+        A 6-digit code has been sent to your device ({{ userEmail }})
+      </p>
+    </div>
+
+    <div class="flex justify-center gap-3 mb-8">
+      <input
+        type="text"
+        maxlength="1"
+        *ngFor="let _ of [1, 2, 3, 4, 5, 6]; let i = index"
+        class="w-12 h-12 text-center text-xl font-bold rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+        [ngClass]="{ 'border-green-500 ring-2 ring-green-200': otpValues[i] }"
+        (keyup)="onOtpChange($event, i)"
+        (keydown)="onKeyDown($event, i)"
+        (paste)="onPaste($event)"
+      />
+    </div>
+
+    <div class="text-center mb-8">
+      <p class="text-sm text-gray-600 mb-2">Didn't receive the code?</p>
+      <button
+        class="text-blue-500 hover:text-blue-600 transition-colors duration-200"
+        (click)="resendCode()"
+        [disabled]="resendDisabled"
+      >
+        Resend Code
+      </button>
+      <p *ngIf="resendDisabled" class="text-sm text-gray-500 mt-2">
+        Resend available in {{ resendCountdown }} seconds
+      </p>
+    </div>
+  </div>
+
+  <div class="flex justify-end space-x-4">
+    <button
+      class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+      (click)="dialogRef.close()"
+    >
+      Cancel
+    </button>
+    <button
+      class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+      [disabled]="!isOtpValid || isVerifying"
+      (click)="verifyOtp()"
+    >
+      {{ isVerifying ? 'Verifying...' : 'Verify' }}
+    </button>
+  </div>
 </div>
