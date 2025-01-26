@@ -967,7 +967,7 @@ export class ExamScheduleServiceProxy {
     /**
      * @return OK
      */
-    getExamSchedule(scheduleId: number): Observable<void> {
+    getExamSchedule(scheduleId: number): Observable<ExamScheduleResponse> {
         let url_ = this.baseUrl + "/api/ExamSchedule/GetExamSchedule/{scheduleId}";
         if (scheduleId === undefined || scheduleId === null)
             throw new Error("The parameter 'scheduleId' must be defined.");
@@ -978,6 +978,7 @@ export class ExamScheduleServiceProxy {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "text/plain"
             })
         };
 
@@ -988,14 +989,14 @@ export class ExamScheduleServiceProxy {
                 try {
                     return this.processGetExamSchedule(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ExamScheduleResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ExamScheduleResponse>;
         }));
     }
 
-    protected processGetExamSchedule(response: HttpResponseBase): Observable<void> {
+    protected processGetExamSchedule(response: HttpResponseBase): Observable<ExamScheduleResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1004,7 +1005,10 @@ export class ExamScheduleServiceProxy {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ExamScheduleResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1017,7 +1021,7 @@ export class ExamScheduleServiceProxy {
     /**
      * @return OK
      */
-    getExamSchedules(): Observable<void> {
+    getExamSchedules(): Observable<ExamScheduleResponse[]> {
         let url_ = this.baseUrl + "/api/ExamSchedule/GetExamSchedules";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1025,6 +1029,7 @@ export class ExamScheduleServiceProxy {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "text/plain"
             })
         };
 
@@ -1035,14 +1040,14 @@ export class ExamScheduleServiceProxy {
                 try {
                     return this.processGetExamSchedules(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ExamScheduleResponse[]>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ExamScheduleResponse[]>;
         }));
     }
 
-    protected processGetExamSchedules(response: HttpResponseBase): Observable<void> {
+    protected processGetExamSchedules(response: HttpResponseBase): Observable<ExamScheduleResponse[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1051,7 +1056,17 @@ export class ExamScheduleServiceProxy {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ExamScheduleResponse.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1192,9 +1207,33 @@ export class SubjectServiceProxy {
     /**
      * @return OK
      */
- 
+    getAllSubject(): Observable<Subject[]> {
+        let url_ = this.baseUrl + "/api/Subject/GetAllSubject";
+        url_ = url_.replace(/[?&]$/, "");
 
-    protected processGetAllGet(response: HttpResponseBase): Observable<Subject[]> {
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllSubject(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllSubject(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Subject[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Subject[]>;
+        }));
+    }
+
+    protected processGetAllSubject(response: HttpResponseBase): Observable<Subject[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1226,7 +1265,57 @@ export class SubjectServiceProxy {
     /**
      * @return OK
      */
- 
+    getSubjectById(id: number): Observable<Subject> {
+        let url_ = this.baseUrl + "/api/Subject/GetSubjectById/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSubjectById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSubjectById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Subject>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Subject>;
+        }));
+    }
+
+    protected processGetSubjectById(response: HttpResponseBase): Observable<Subject> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Subject.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
     /**
      * @param body (optional) 
      * @return OK

@@ -9,6 +9,12 @@ import {
 import { ServiceProxyModule } from '../../../service-proxies/service-proxy.module';
 import { DateTime } from 'luxon';
 
+interface Subject {
+  name: string;
+  date: string;
+  topics: string[];
+}
+
 @Component({
   selector: 'app-create-or-update-exam',
   standalone: true,
@@ -20,7 +26,7 @@ export class CreateOrUpdateExamComponent {
   exam = {
     examName: '',
     examDate: '',
-    subjects: [] as any[],
+    subjects: [] as Subject[],
     dailyStudyHours: 0,
   };
 
@@ -32,6 +38,7 @@ export class CreateOrUpdateExamComponent {
     this.exam.subjects.push({
       name: '',
       topics: [''],
+      date: ''
     });
   }
 
@@ -40,7 +47,40 @@ export class CreateOrUpdateExamComponent {
   }
 
   saveExam() {
+    if (this.exam.subjects.length === 0) {
+      console.error('No subjects added');
+      return;
+    }
 
+    const examSubjectTimes = this.exam.subjects
+      .filter(subject => subject.name && subject.date)
+      .map(subject => {
+        const dto = new ExamSubjectTimeDto();
+        dto.subject = subject.name;
+        dto.topicOrChapter = subject.topics.filter(t => t.trim() !== '');
+        dto.examDateTime = DateTime.fromISO(subject.date);
+        return dto;
+      });
 
+    if (examSubjectTimes.length === 0) {
+      console.error('No valid subjects to save');
+      return;
+    }
+
+    const request = new ExamScheduleRequest();
+    request.dailyStudyHours = this.exam.dailyStudyHours;
+    request.examDate = DateTime.fromISO(this.exam.examDate);
+    request.examSubjectTimes = examSubjectTimes;
+
+    console.log('Request payload:', JSON.stringify(request));
+
+    this._examScheduleService.createExamSchedule(request).subscribe(
+      (response) => {
+        console.log('Exam saved successfully:', response);
+      },
+      (error) => {
+        console.error('Error saving exam:', error);
+      }
+    );
   }
 }

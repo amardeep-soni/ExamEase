@@ -37,17 +37,6 @@
       />
     </div>
 
-    <!-- Daily Study Hours -->
-    <div class="space-y-2">
-      <label class="block text-black">Daily Study Hours</label>
-      <input
-        type="number"
-        [(ngModel)]="exam.dailyStudyHours"
-        name="dailyStudyHours"
-        class="w-full p-2 border rounded-lg bg-white text-black"
-      />
-    </div>
-
     <!-- Subjects Section -->
     <div class="space-y-2">
       <div class="flex justify-between items-center">
@@ -69,7 +58,7 @@
         >
           <input
             type="text"
-            [(ngModel)]="subject.subject"
+            [(ngModel)]="subject.name"
             [name]="'subject' + i"
             placeholder="Subject"
             class="w-full p-2 border rounded-lg bg-white text-black"
@@ -80,7 +69,7 @@
             <label class="block text-black">Subject Date</label>
             <input
               type="date"
-              [(ngModel)]="subject.examDateTime"
+              [(ngModel)]="subject.date"
               [name]="'subjectDate' + i"
               class="w-full p-2 border rounded-lg bg-white text-black"
             />
@@ -89,12 +78,12 @@
           <!-- Topics -->
           <div>
             <div
-              *ngFor="let topic of subject.topicOrChapter; let j = index"
+              *ngFor="let topic of subject.topics; let j = index"
               class="mt-2"
             >
               <input
                 type="text"
-                [(ngModel)]="subject.topicOrChapter[j]"
+                [(ngModel)]="subject.topics[j]"
                 [name]="'topic' + i + j"
                 placeholder="Topic"
                 class="w-full p-2 border rounded-lg bg-white text-black"
