@@ -49,7 +49,7 @@ export class LoginComponent {
           next: (res) => {
             if (res.isError === 'false' && res.message) {
               this.authService.setToken(res.message);
-              this.router.navigate(['/dashboard']);
+              this.router.navigate(['/subjects']);
             } else {
               this.errorMessage = res.message || 'Login failed. Please try again.';
             }
