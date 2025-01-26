@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Office2010.Word;
 using Microsoft.EntityFrameworkCore;
 using WebApi.IRepositories;
 using WebApi.Services;
@@ -60,9 +61,12 @@ public class SubjectRepository : ISubjectRepository
             .Split(',', StringSplitOptions.RemoveEmptyEntries)
             .ToList() ?? new List<string>();
 
+        // Remove files not in the request
+        existingFiles = existingFiles.Where(f => request.FileNames.Contains(f)).ToList();
+
+        // Add new files from the request
         existingFiles.AddRange(request.FileNames);
         subject.FileNames = string.Join(",", existingFiles.Distinct());
-       
 
         subject.UpdatedDate = DateTime.UtcNow;
 
@@ -74,16 +78,21 @@ public class SubjectRepository : ISubjectRepository
     public async Task DeleteAsync(int id, string userEmail)
     {
         var subject = await GetByIdAsync(id, userEmail);
-        var fileNames = subject?.FileNames?.Split(',', StringSplitOptions.RemoveEmptyEntries);
-        if (fileNames.Any() == true)
-        {
-            foreach (var fileName in fileNames)
-            {
-                await _aiService.DeleteDataFromMemory(fileName);
-            }
-        }
         if (subject != null)
         {
+            var fileNames = subject.FileNames.Split(',').ToList();
+            if (fileNames.Any())
+            {
+                foreach (var fileName in fileNames)
+                {
+                    var filePath = Path.Combine("wwwroot", "subject", fileName);
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+                await _aiService.DeleteDocumentsAsync(fileNames);
+            }
             _context.Subjects.Remove(subject);
             await _context.SaveChangesAsync();
         }

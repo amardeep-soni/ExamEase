@@ -95,6 +95,15 @@ namespace WebApi.Controllers
         [HttpDelete("DeleteDocumentAsync")]
         public async Task<ResponseMessage> DeleteDocumentAsync(List<string> documentIds)
         {
+            foreach (var documentId in documentIds)
+            {
+                var filePath = Path.Combine("wwwroot", "subject", documentId);
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
             await _aiService.DeleteDocumentsAsync(documentIds);
             return new ResponseMessage { IsError = "false", Message = "Documents deleted successfully." };
         }
