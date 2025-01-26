@@ -25,16 +25,16 @@ namespace WebApi.Controllers
             _userContextService = userContextService;
         }
 
-        [HttpGet("GetAll")]
-        public async Task<ActionResult<List<Subject>>> GetAll()
+        [HttpGet("GetAllSubject")]
+        public async Task<ActionResult<List<Subject>>> GetAllSubject()
         {
             var userEmail = _userContextService.GetUserEmail();
             var subjects = await _subjectService.GetAllAsync(userEmail);
             return Ok(subjects);
         }
 
-        [HttpGet("GetAll/{id}")]
-        public async Task<ActionResult<Subject>> GetById(int id)
+        [HttpGet("GetSubjectById/{id}")]
+        public async Task<ActionResult<Subject>> GetSubjectById(int id)
         {
             var userEmail = _userContextService.GetUserEmail();
             var subject = await _subjectService.GetByIdAsync(id, userEmail);

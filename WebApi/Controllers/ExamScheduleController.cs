@@ -37,7 +37,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("GetExamSchedule/{scheduleId}")]
-        public async Task<IActionResult> GetExamSchedule(int scheduleId)
+        public async Task<ActionResult<ExamScheduleResponse>> GetExamSchedule(int scheduleId)
         {
             var result = await _examRepository.GetExamScheduleByIdAsync(scheduleId);
             if (result == null)
@@ -46,7 +46,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("GetExamSchedules")]
-        public async Task<IActionResult> GetExamSchedules()
+        public async Task<ActionResult<List<ExamScheduleResponse>>> GetExamSchedules()
         {
             var result = await _examRepository.GetExamSchedules();
             return Ok(result);
