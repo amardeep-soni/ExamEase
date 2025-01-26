@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { StudyPlanDto, StudyPlanServiceProxy, StudyTasksDto } from '../../service-proxies/service-proxies';
 import { ServiceProxyModule } from '../../service-proxies/service-proxy.module';
 import { MatDialog } from '@angular/material/dialog';
 import { TaskPreviewDialogComponent } from './task-preview-dialog/task-preview-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { DatePipe } from '@angular/common';
 
 interface Task {
   subject: string;
@@ -16,7 +17,7 @@ interface Task {
 
 @Component({
   selector: 'app-study-plan',
-  imports: [CommonModule, ServiceProxyModule, MatDialogModule],
+  imports: [CommonModule, ServiceProxyModule, MatDialogModule, RouterModule],
   templateUrl: './study-plan.component.html',
   styleUrl: './study-plan.component.css'
 })
@@ -32,6 +33,7 @@ export class StudyPlanComponent {
   tasksData!: StudyPlanDto;
   tasks: Task[] = [];
   hoveredDate: Date | null = null;
+  weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   constructor(
     private route: ActivatedRoute,
@@ -91,35 +93,23 @@ export class StudyPlanComponent {
     console.log('Displayed tasks:', this.displayedTasks);
   }
 
-  private formatDate(date: Date): string {
-    const day = date.getDate();
-    const month = date.toLocaleString('default', { month: 'short' });
-    const year = date.getFullYear();
-    return `${day} ${month} ${year}`;
+  formatDate(date: Date): string {
+    if (!date) return '';
+    return new DatePipe('en-US').transform(date, 'dd MMM yyyy') || '';
   }
 
-  goForward(): void {
+  goForward() {
     const nextDate = new Date(this.currentDate);
-    nextDate.setDate(this.currentDate.getDate() + 1);
-    const nextDateStr = this.formatDate(nextDate);
-
-    const hasNextDayTasks = this.tasks.some(task => task.date === nextDateStr);
-    if (hasNextDayTasks) {
-      this.currentDate = nextDate;
-      this.updateDisplayedTasks();
-    }
+    nextDate.setDate(nextDate.getDate() + 1);
+    this.currentDate = nextDate;
+    this.updateDisplayedTasks();
   }
 
-  goBackward(): void {
+  goBackward() {
     const prevDate = new Date(this.currentDate);
-    prevDate.setDate(this.currentDate.getDate() - 1);
-    const prevDateStr = this.formatDate(prevDate);
-
-    const hasPrevDayTasks = this.tasks.some(task => task.date === prevDateStr);
-    if (hasPrevDayTasks) {
-      this.currentDate = prevDate;
-      this.updateDisplayedTasks();
-    }
+    prevDate.setDate(prevDate.getDate() - 1);
+    this.currentDate = prevDate;
+    this.updateDisplayedTasks();
   }
 
   getUniqueSubjects(): string[] {
@@ -147,18 +137,27 @@ export class StudyPlanComponent {
   generateCalendarDays() {
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth();
+    
+    // Get first day of the month
     const firstDay = new Date(year, month, 1);
+    // Get last day of the month
     const lastDay = new Date(year, month + 1, 0);
-
+    
+    // Calculate days from previous month
+    const daysFromPrevMonth = firstDay.getDay();
+    const daysFromNextMonth = 6 - lastDay.getDay();
+    
     const weeks: Date[][] = [];
     let currentWeek: Date[] = [];
-
-    // Add empty days until first day of month
-    for (let i = 0; i < firstDay.getDay(); i++) {
-      currentWeek.push(new Date(year, month - 1, lastDay.getDate() - firstDay.getDay() + i + 1));
+    
+    // Add days from previous month
+    const prevMonth = new Date(year, month - 1);
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    for (let i = prevMonthLastDay - daysFromPrevMonth + 1; i <= prevMonthLastDay; i++) {
+      currentWeek.push(new Date(prevMonth.getFullYear(), prevMonth.getMonth(), i));
     }
-
-    // Add all days of month
+    
+    // Add days from current month
     for (let day = 1; day <= lastDay.getDate(); day++) {
       if (currentWeek.length === 7) {
         weeks.push(currentWeek);
@@ -166,13 +165,21 @@ export class StudyPlanComponent {
       }
       currentWeek.push(new Date(year, month, day));
     }
-
-    // Fill remainder of last week
-    while (currentWeek.length < 7) {
-      const nextDate = new Date(year, month + 1, currentWeek.length - lastDay.getDate());
-      currentWeek.push(nextDate);
+    
+    // Add days from next month
+    const nextMonth = new Date(year, month + 1);
+    for (let day = 1; day <= daysFromNextMonth; day++) {
+      currentWeek.push(new Date(nextMonth.getFullYear(), nextMonth.getMonth(), day));
     }
-    weeks.push(currentWeek);
+    
+    // Push the last week if it exists
+    if (currentWeek.length > 0) {
+      while (currentWeek.length < 7) {
+        const nextDay = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), currentWeek.length);
+        currentWeek.push(nextDay);
+      }
+      weeks.push(currentWeek);
+    }
 
     this.weeks = weeks;
   }
@@ -186,18 +193,9 @@ export class StudyPlanComponent {
   selectDate(date: Date) {
     if (!date) return;
     this.selectedDate = date;
-    const dateStr = this.formatDate(date);
-    const tasksForDate = this.getTasksForDate(date);
-
-    if (tasksForDate.length > 0) {
-      this.dialog.open(TaskPreviewDialogComponent, {
-        width: '400px',
-        data: {
-          date: dateStr,
-          tasks: tasksForDate
-        }
-      });
-    }
+    this.currentDate = date;
+    this.isCalendarView = false;
+    this.updateDisplayedTasks();
   }
 
   showTaskPreview(date: Date) {
@@ -214,5 +212,46 @@ export class StudyPlanComponent {
     if (!date) return [];
     const dateStr = this.formatDate(date);
     return this.tasks.filter(task => task.date === dateStr);
+  }
+
+  setView(isCalendar: boolean) {
+    this.isCalendarView = isCalendar;
+    if (!isCalendar) {
+      this.updateDisplayedTasks();
+    }
+  }
+
+  previousMonth() {
+    this.currentDate = new Date(
+      this.currentDate.getFullYear(),
+      this.currentDate.getMonth() - 1,
+      1
+    );
+    this.generateCalendarDays();
+  }
+
+  nextMonth() {
+    this.currentDate = new Date(
+      this.currentDate.getFullYear(),
+      this.currentDate.getMonth() + 1,
+      1
+    );
+    this.generateCalendarDays();
+  }
+
+  isToday(date: Date): boolean {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
+  }
+
+  isSameMonth(date: Date): boolean {
+    return date.getMonth() === this.currentDate.getMonth() &&
+           date.getFullYear() === this.currentDate.getFullYear();
+  }
+
+  isSelectedDate(date: Date): boolean {
+    return this.selectedDate?.getTime() === date.getTime();
   }
 }
