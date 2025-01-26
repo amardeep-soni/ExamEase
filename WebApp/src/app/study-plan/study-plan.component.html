@@ -4,10 +4,10 @@
     <button class="back-button">
       <i class="fas fa-arrow-left"></i>
     </button>
-    <h1 class="exam-title">Exam Name {{tasksData.examName}}</h1>
+    <!-- <h1 class="exam-title">Exam Name {{tasksData.examName}}</h1> -->
     <div class="header-controls">
-      <span class="current-date">{{ formatDate(currentDate) }}</span>
-      <span class="exam-date">Exam: {{displayedTasks[0]?.examDate}}</span>
+      <!-- <span class="current-date">{{ formatDate(currentDate) }}</span> -->
+      <!-- <span class="exam-date">Exam: {{displayedTasks[0]?.examDate}}</span> -->
       <button class="view-toggle" (click)="toggleView()">
         <i class="fas fa-th-large"></i>
       </button>
@@ -59,7 +59,7 @@
       <div *ngFor="let task of displayedTasks" class="task-item">
         <div class="task-header">
           <h3>{{task.subject}}</h3>
-          <span class="card-exam-date">{{task.examDate}}</span>
+          <span class="card-exam-date">{{task.date}}</span>
         </div>
         <p>Time: {{task.time}}</p>
         <p>Topic: {{task.topic}}</p>
