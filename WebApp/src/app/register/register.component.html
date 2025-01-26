@@ -1,8 +1,10 @@
 <div
-  class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+  class="min-h-screen flex flex-col justify-center bg-gray-50 py-12 sm:px-6 lg:px-8"
 >
   <div class="sm:mx-auto sm:w-full sm:max-w-md">
-    <!-- Logo/Brand Section -->
+    <div class="flex justify-center">
+      <i class="fas fa-graduation-cap text-5xl text-primary-600"></i>
+    </div>
     <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
       Create your account
     </h2>
@@ -10,7 +12,7 @@
       Or
       <a
         routerLink="/login"
-        class="font-medium text-indigo-600 hover:text-indigo-500"
+        class="font-medium text-primary-600 hover:text-primary-500 transition-colors duration-200"
       >
         sign in to your account
       </a>
@@ -18,7 +20,7 @@
   </div>
 
   <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+    <div class="bg-white py-8 px-4 shadow-lg rounded-lg sm:px-10">
       <form
         #registerForm="ngForm"
         (ngSubmit)="onSubmit(registerForm)"
@@ -29,7 +31,10 @@
           <label for="fullName" class="block text-sm font-medium text-gray-700">
             Full Name
           </label>
-          <div class="mt-1">
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-user text-gray-400"></i>
+            </div>
             <input
               id="fullName"
               name="fullName"
@@ -38,11 +43,12 @@
               #fullName="ngModel"
               required
               minlength="3"
-              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
               [ngClass]="{
                 'border-red-500':
                   fullName.invalid && (fullName.dirty || fullName.touched)
               }"
+              placeholder="Enter your full name"
             />
           </div>
           <div
@@ -63,7 +69,10 @@
           <label for="email" class="block text-sm font-medium text-gray-700">
             Email address
           </label>
-          <div class="mt-1">
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-envelope text-gray-400"></i>
+            </div>
             <input
               id="email"
               name="email"
@@ -72,11 +81,12 @@
               #email="ngModel"
               required
               email
-              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
               [ngClass]="{
                 'border-red-500':
                   email.invalid && (email.dirty || email.touched)
               }"
+              placeholder="Enter your email"
             />
           </div>
           <div
@@ -98,7 +108,10 @@
           >
             Phone Number
           </label>
-          <div class="mt-1">
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-phone text-gray-400"></i>
+            </div>
             <input
               id="phoneNumber"
               name="phoneNumber"
@@ -107,13 +120,13 @@
               #phoneNumber="ngModel"
               required
               pattern="^[0-9]{10}$"
-              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
               [ngClass]="{
                 'border-red-500':
                   phoneNumber.invalid &&
                   (phoneNumber.dirty || phoneNumber.touched)
               }"
-              placeholder="1234567890"
+              placeholder="Enter your phone number"
             />
           </div>
           <div
@@ -136,7 +149,10 @@
           <label for="password" class="block text-sm font-medium text-gray-700">
             Password
           </label>
-          <div class="mt-1">
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-lock text-gray-400"></i>
+            </div>
             <input
               id="password"
               name="password"
@@ -145,11 +161,12 @@
               #password="ngModel"
               required
               minlength="6"
-              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
               [ngClass]="{
                 'border-red-500':
                   password.invalid && (password.dirty || password.touched)
               }"
+              placeholder="Enter your password"
             />
           </div>
           <div
@@ -169,10 +186,14 @@
         <div>
           <button
             type="submit"
-            [disabled]="registerForm.invalid"
-            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="registerForm.invalid || isLoading"
+            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Register
+            <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ isLoading ? 'Creating account...' : 'Create account' }}
           </button>
         </div>
       </form>

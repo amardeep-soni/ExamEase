@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import {
   AuthServiceProxy,
   ForgotPasswordDto,
@@ -16,7 +16,8 @@ import { ForgotPasswordDialogComponent } from '../dialogs/forgot-password-dialog
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, ServiceProxyModule, FormsModule],
+  standalone: true,
+  imports: [CommonModule, ServiceProxyModule, FormsModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })

@@ -1,66 +1,104 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-100">
-  <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
-    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">
-      Welcome Back
+<div class="min-h-[calc(100vh-56px)] flex flex-col justify-center bg-gray-50 py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="flex justify-center">
+      <i class="fas fa-graduation-cap text-5xl text-primary-600"></i>
+    </div>
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+      Welcome back
     </h2>
-    <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)">
-      <!-- Email Field -->
-      <div class="mb-4">
-        <label for="email" class="block text-sm font-medium text-gray-700 mb-1"
-          >Email</label
-        >
-        <input
-          type="email"
-          id="email"
-          name="email"
-          [(ngModel)]="loginData.email"
-          placeholder="Enter your email"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-          required
-        />
-      </div>
-
-      <!-- Password Field -->
-      <div class="mb-4">
-        <label
-          for="password"
-          class="block text-sm font-medium text-gray-700 mb-1"
-          >Password</label
-        >
-        <input
-          type="password"
-          id="password"
-          name="password"
-          [(ngModel)]="loginData.password"
-          placeholder="Enter your password"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-          required
-        />
-      </div>
-
-      <!-- Error Message -->
-      <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-        {{ errorMessage }}
-      </div>
-
-      <!-- Login Button -->
-      <button type="submit" [disabled]="loginForm.invalid || isLoading"
-        class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200 flex items-center justify-center">
-        <i *ngIf="isLoading" class="fas fa-spinner fa-spin mr-2"></i>
-        {{ isLoading ? 'Signing in...' : 'Sign In' }}
-      </button>
-
-      <!-- Forgot Password Link -->
-      <p class="text-sm text-center text-gray-600 mt-4">
-        <a href="javascript:void(0)" (click)="openForgotPasswordDialog()" class="text-blue-600 hover:underline">Forgot Password?</a>
-      </p>
-    </form>
- 
-
-    <!-- Register Redirect -->
-    <p class="text-sm text-center text-gray-600 mt-6">
-      Don't have an account?
-      <a href="/register" class="text-blue-600 hover:underline">Sign up</a>
+    <p class="mt-2 text-center text-sm text-gray-600">
+      Or
+      <a routerLink="/register"
+        class="font-medium text-primary-600 hover:text-primary-500 transition-colors duration-200">
+        create a new account
+      </a>
     </p>
+  </div>
+
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow-lg rounded-lg sm:px-10">
+      <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)" class="space-y-6">
+        <!-- Email Field -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">
+            Email address
+          </label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-envelope text-gray-400"></i>
+            </div>
+            <input type="email" id="email" name="email" [(ngModel)]="loginData.email" required email
+              class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
+              placeholder="Enter your email" />
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">
+            Password
+          </label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-lock text-gray-400"></i>
+            </div>
+            <input [type]="showPassword ? 'text' : 'password'" id="password" name="password"
+              [(ngModel)]="loginData.password" required
+              class="appearance-none block w-full pl-10 pr-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
+              placeholder="Enter your password" />
+            <button type="button" (click)="togglePasswordVisibility()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
+                class="text-gray-400 hover:text-gray-600"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="rounded-md bg-red-50 p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-exclamation-circle text-red-400"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-red-700">{{ errorMessage }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Remember Me & Forgot Password -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <input type="checkbox" id="remember-me" name="remember-me"
+              class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded transition-colors duration-200" />
+            <label for="remember-me" class="ml-2 block text-sm text-gray-900">
+              Remember me
+            </label>
+          </div>
+
+          <div class="text-sm">
+            <button type="button" (click)="openForgotPasswordDialog()"
+              class="font-medium text-primary-600 hover:text-primary-500 transition-colors duration-200">
+              Forgot your password?
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+          <button type="submit" [disabled]="loginForm.invalid || isLoading"
+            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+            <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg"
+              fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+              </path>
+            </svg>
+            {{ isLoading ? 'Signing in...' : 'Sign in' }}
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

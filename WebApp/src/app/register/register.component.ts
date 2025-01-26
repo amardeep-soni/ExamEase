@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { NgForm, FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import {
   AuthServiceProxy,
   RegisterDto,
@@ -21,35 +21,50 @@ import {
 
 @Component({
   selector: 'app-register',
-  imports: [CommonModule, FormsModule, ServiceProxyModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, ServiceProxyModule, RouterModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
 })
 export class RegisterComponent {
   user: RegisterDto = new RegisterDto();
+  isLoading = false;
+  errorMessage = '';
+
   constructor(
     private router: Router,
     private _authService: AuthServiceProxy,
-    private dialog: MatDialog // Add MatDialog to the constructor
+    private dialog: MatDialog
   ) {}
 
   onSubmit(form: NgForm) {
     if (form.valid) {
-      console.log(this.user);
-      this._authService.register(this.user).subscribe((res: any) => {
-        if (res) {
-          const dialogRef = this.dialog.open(OtpDialogComponent, {
-            width: '400px', // Increased width
-            maxWidth: '90vw', // Responsive width
-            data: { userEmail: this.user.email }, // Pass the email to the dialog
-          });
+      this.isLoading = true;
+      this.errorMessage = '';
 
-          dialogRef.afterClosed().subscribe((result) => {
-            console.log(result);
-            if (result) {
-              this.router.navigate(['/login']);
-            }
-          });
+      this._authService.register(this.user).subscribe({
+        next: (res: any) => {
+          if (res) {
+            const dialogRef = this.dialog.open(OtpDialogComponent, {
+              width: '400px',
+              maxWidth: '90vw',
+              data: { userEmail: this.user.email },
+            });
+
+            dialogRef.afterClosed().subscribe((result) => {
+              if (result) {
+                this.router.navigate(['/login']);
+              }
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Registration error:', error);
+          this.errorMessage = 'An error occurred during registration. Please try again.';
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
         }
       });
     }
