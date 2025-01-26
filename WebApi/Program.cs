@@ -142,7 +142,7 @@ builder.Services.AddCors(options =>
         builder =>
         {
             builder
-                .WithOrigins("http://localhost:4200")
+                .WithOrigins("http://localhost:4200", "https://examease.amardeepdev.com")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials();
