@@ -2,6 +2,7 @@
 using WebApi.Dtos;
 using WebApi.Services;
 using System.IO;
+using System.Linq;
 
 namespace WebApi.Controllers
 {
@@ -17,62 +18,85 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("GetAiAnswer")]
-        public async Task<IActionResult> GetAiAnswer(string question)
+        public async Task<ResponseMessage> GetAiAnswer(string question)
         {
             var result = await _aiService.GetAiAnswer(question);
-            return Ok(result);
+            return new ResponseMessage { IsError = "false", Message = result };
         }
 
         [HttpPost("AddDataToMemory")]
-        public async Task<IActionResult> AddDataToMemory([FromBody] AddDataRequest request)
+        public async Task<ResponseMessage> AddDataToMemory([FromBody] AddDataRequest request)
         {
             await _aiService.AddDataToMemory(request.Data, request.DocumentId);
-            return Ok();
+            return new ResponseMessage { IsError = "false", Message = "Data added to memory successfully." };
         }
 
         [HttpDelete("DeleteDataFromMemory")]
-        public async Task<IActionResult> DeleteDataFromMemory(string documentId)
+        public async Task<ResponseMessage> DeleteDataFromMemory(string documentId)
         {
             await _aiService.DeleteDataFromMemory(documentId);
-            return Ok();
+            return new ResponseMessage { IsError = "false", Message = "Data deleted from memory successfully." };
         }
 
         [HttpPost("GenerateStudyPlanTask")]
-        public async Task<IActionResult> GenerateStudyPlanTask(ExamScheduleRequest examScheduleRequest)
+        public async Task<ResponseMessage> GenerateStudyPlanTask(ExamScheduleRequest examScheduleRequest)
         {
             var result = await _aiService.GenerateStudyPlanTask(examScheduleRequest);
-            return Ok(result);
+            return new ResponseMessage { IsError = "false", Message = "Study plan generated successfully." };
         }
 
+
         [HttpPost("UploadPdfNotes")]
-        public async Task<IActionResult> UploadPdfNotes(IFormFile file, string documentId)
+        public async Task<ResponseMessage> UploadPdfNotes(List<IFormFile> files, string subject)
         {
-            if (file == null || file.Length == 0)
-                return BadRequest("File is empty.");
+            if (files == null || files.Count == 0)
+                return new ResponseMessage { IsError = "true", Message = "No files uploaded." };
 
-            if (Path.GetExtension(file.FileName).ToLower() != ".pdf")
-                return BadRequest("Only PDF files are allowed.");
+            var filePaths = new List<string>();
 
-            using (var stream = file.OpenReadStream())
+            foreach (var file in files)
             {
-                await _aiService.UploadPdfNotesAsync(stream, documentId);
+                if (Path.GetExtension(file.FileName).ToLower() != ".pdf")
+                    return new ResponseMessage { IsError = "true", Message = "Only PDF files are allowed." };
+
+                var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                var extension = Path.GetExtension(file.FileName);
+                var directory = Path.Combine("wwwroot", "subject");
+                Directory.CreateDirectory(directory);
+
+                var filePath = Path.Combine(directory, fileName + extension);
+                var counter = 1;
+                while (System.IO.File.Exists(filePath))
+                {
+                    filePath = Path.Combine(directory, $"{fileName}{counter}{extension}");
+                    counter++;
+                }
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                filePaths.Add(filePath);
             }
 
-            return Ok("PDF notes uploaded successfully.");
+            await _aiService.AddDocumentToMemory(filePaths, subject);
+
+            return new ResponseMessage { IsError = "false", Message = string.Join(", ", filePaths.Select(Path.GetFileName)) };
         }
 
         [HttpGet("AskQuestion")]
-        public async Task<IActionResult> AskQuestion(string question)
+        public async Task<ResponseMessage> AskQuestion(string question, string subject)
         {
-            var result = await _aiService.AskQuestionAsync(question);
-            return Ok(result);
+            var result = await _aiService.AskQuestionAsync(question, subject);
+            return result;
         }
 
         [HttpDelete("DeleteDocumentAsync")]
-        public async Task<IActionResult> DeleteDocumentAsync(string documentId)
+        public async Task<ResponseMessage> DeleteDocumentAsync(List<string> documentIds)
         {
-            await _aiService.DeleteDocumentAsync(documentId);
-            return Ok();
+            await _aiService.DeleteDocumentsAsync(documentIds);
+            return new ResponseMessage { IsError = "false", Message = "Documents deleted successfully." };
         }
     }
 

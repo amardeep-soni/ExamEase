@@ -12,7 +12,8 @@ namespace WebApi.Services
         public DbSet<User> Users { get; set; }
         public DbSet<ExamSchedule> ExamSchedules { get; set; }
         public DbSet<ExamSubjectTime> ExamSubjectTimes { get; set; }
-        public DbSet<StudyPlan> StudyPlans { get; set; } // Added StudyPlan DbSet
+        public DbSet<StudyPlan> StudyPlans { get; set; }
+        public DbSet<Subject> Subjects { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -97,6 +98,17 @@ namespace WebApi.Services
                     .WithMany()
                     .HasForeignKey(e => e.ExamScheduleId)
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Subject>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.CreatedDate)
+                    .IsRequired()
+                    .HasDefaultValueSql("GETDATE()");
+
+                entity.Property(e => e.UpdatedDate);
             });
         }
     }

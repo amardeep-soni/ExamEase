@@ -172,42 +172,41 @@ namespace WebApi.Services
             }
         }
 
-        public async Task UploadPdfNotesAsync(Stream fileStream, string documentId)
+        public async Task AddDocumentToMemory(List<string> filePaths, string subject)
         {
-            var filePath = Path.Combine("wwwroot", $"{documentId}.pdf");
-            using (var fileStreamOutput = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            filePaths.ForEach(async filePath =>
             {
-                await fileStream.CopyToAsync(fileStreamOutput);
-            }
-
-            var tag = new TagCollection();
-            tag.Add("email", _userContextService.GetUserEmail());
-            await _memory.ImportDocumentAsync(filePath, documentId, tags: tag);
+                var fileName = Path.GetFileName(filePath);
+                var tag = new TagCollection();
+                tag.Add("email", _userContextService.GetUserEmail());
+                tag.Add("subject", subject);
+                await _memory.ImportDocumentAsync(filePath, fileName, tags: tag);
+            });
         }
 
-        public async Task<string> GetAiAnswerFromIndex(string question)
-        {
-            var searchResult = await _memory.SearchAsync(
-                question,
-                minRelevance: 0.3,
-                filter: new MemoryFilter().ByTag("email", _userContextService.GetUserEmail())
-            );
-            if (searchResult.NoResult == false)
-            {
-                var found = searchResult.Results[0].Partitions.FirstOrDefault();
-                var documentId = searchResult.Results[0].DocumentId;
-                return found.Text + '~' + documentId;
-            }
-            return "No relevant answer found.";
-        }
+        //public async Task<string> GetAiAnswerFromIndex(string question)
+        //{
+        //    var searchResult = await _memory.SearchAsync(
+        //        question,
+        //        minRelevance: 0.3,
+        //        filter: new MemoryFilter().ByTag("email", _userContextService.GetUserEmail())
+        //    );
+        //    if (searchResult.NoResult == false)
+        //    {
+        //        var found = searchResult.Results[0].Partitions.FirstOrDefault();
+        //        var documentId = searchResult.Results[0].DocumentId;
+        //        return found.Text + '~' + documentId;
+        //    }
+        //    return "No relevant answer found.";
+        //}
 
-        public async Task<ResponseMessage> AskQuestionAsync(string question)
+        public async Task<ResponseMessage> AskQuestionAsync(string question, string subject)
         {
             var res = new ResponseMessage();
             var userEmail = _userContextService.GetUserEmail();
             var memoryAnswer = await _memory.AskAsync(
                 question,
-                filter: new MemoryFilter().ByTag("email", userEmail),
+                filter: new MemoryFilter().ByTag("email", userEmail).ByTag("subject", subject),
                 minRelevance: 0.4
             );
 
@@ -251,9 +250,12 @@ namespace WebApi.Services
             return res;
         }
 
-        public async Task DeleteDocumentAsync(string documentId)
+        public async Task DeleteDocumentsAsync(List<string> documentIds)
         {
-            await _memory.DeleteDocumentAsync(documentId);
+            foreach (var documentId in documentIds)
+            {
+                await _memory.DeleteDocumentAsync(documentId);
+            }
         }
     }
 }

@@ -118,7 +118,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IExamScheduleRepository, ExamRepository>();
-builder.Services.AddScoped<IStudyPlanRepository, StudyPlanRepository>();
+builder.Services.AddScoped<IStudyPlanRepository, StudyPlanRepository>();         
+builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
