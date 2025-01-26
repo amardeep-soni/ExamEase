@@ -7,10 +7,11 @@
     <!-- <h1 class="exam-title">Exam Name {{tasksData.examName}}</h1> -->
     <div class="header-controls">
       <!-- <span class="current-date">{{ formatDate(currentDate) }}</span> -->
-      <!-- <span class="exam-date">Exam: {{displayedTasks[0]?.examDate}}</span> -->
       <button class="view-toggle" (click)="toggleView()">
         <i class="fas fa-th-large"></i>
       </button>
+
+      
       <button class="calendar-toggle" (click)="toggleView()">
         <i class="far fa-calendar"></i>
       </button>
@@ -27,8 +28,7 @@
 
     <div class="calendar-grid">
       <div class="week" *ngFor="let week of weeks">
-        <div class="day" *ngFor="let date of week" 
-          [class.has-tasks]="hasTasksForDate(date) > 0"
+        <div class="day" *ngFor="let date of week" [class.has-tasks]="hasTasksForDate(date) > 0"
           [class.selected]="selectedDate && date && selectedDate.getDate() === date.getDate()"
           (click)="date && selectDate(date)">
           <span class="date-number">{{date ? date.getDate() : ''}}</span>
@@ -38,7 +38,7 @@
         </div>
       </div>
     </div>
-    
+
   </div>
 
   <!-- List View -->
@@ -49,6 +49,8 @@
         <i class="fas fa-chevron-left"></i>
       </button>
       <!-- <span class="current-date">{{ formatDate(currentDate) }}</span> -->
+      <span class="exam-date">Exam: {{displayedTasks[0]?.date}}</span>
+
       <button class="nav-button" (click)="goForward()">
         <i class="fas fa-chevron-right"></i>
       </button>
