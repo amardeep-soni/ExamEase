@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DateTime } from 'luxon';
 import { finalize } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -20,7 +20,7 @@ interface Subject {
 @Component({
   selector: 'app-create-or-update-exam',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './create-or-update-exam.component.html',
   styleUrl: './create-or-update-exam.component.css',
   providers: [ExamScheduleServiceProxy],

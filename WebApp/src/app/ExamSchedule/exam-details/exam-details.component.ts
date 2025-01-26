@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ExamScheduleResponse, ExamScheduleServiceProxy } from '../../../service-proxies/service-proxies';
 import { ServiceProxyModule } from '../../../service-proxies/service-proxy.module';
 
 @Component({
   selector: 'app-exam-details',
   standalone: true,
-  imports: [CommonModule, ServiceProxyModule,DatePipe],
+  imports: [CommonModule, ServiceProxyModule,DatePipe, RouterModule],
   templateUrl: './exam-details.component.html',
   styleUrl: './exam-details.component.css'
 })
