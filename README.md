@@ -89,7 +89,7 @@ ExamEase is an intelligent exam preparation platform that helps students create 
 
 ```
 bash
-git clone [repository-url]
+git clone https://github.com/amardeep-soni/ExamEase.git
 ```
 
 2. Frontend Setup
