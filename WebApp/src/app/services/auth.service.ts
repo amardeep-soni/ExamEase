@@ -86,4 +86,10 @@ export class AuthService {
   logout(): void {
     this.clearToken();
   }
+
+  isLoggedIn(): boolean {
+    // Check if user has valid auth token
+    const token = localStorage.getItem(this.TOKEN_KEY);
+    return !!token; // Returns true if token exists, false otherwise
+  }
 }

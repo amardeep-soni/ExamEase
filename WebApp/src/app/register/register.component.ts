@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgForm, FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import {
@@ -18,6 +18,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -26,7 +27,7 @@ import {
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   user: RegisterDto = new RegisterDto();
   isLoading = false;
   errorMessage = '';
@@ -34,9 +35,17 @@ export class RegisterComponent {
   constructor(
     private router: Router,
     private _authService: AuthServiceProxy,
-    private dialog: MatDialog
-  ) {}
+    private dialog: MatDialog,
+    private authService: AuthService
+  ) { }
 
+  ngOnInit() {
+    if (this.authService.isLoggedIn()) {
+      console.log('User is already logged in');
+
+      this.router.navigate(['/subjects']);
+    }
+  }
   onSubmit(form: NgForm) {
     if (form.valid) {
       this.isLoading = true;

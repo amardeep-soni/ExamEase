@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import {
@@ -21,7 +21,7 @@ import { ForgotPasswordDialogComponent } from '../dialogs/forgot-password-dialog
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginData: LoginDto = {} as LoginDto;
   isLoading = false;
   showPassword = false;
@@ -34,6 +34,14 @@ export class LoginComponent {
     private authService: AuthService,
     private dialog: MatDialog
   ) {}
+
+  ngOnInit() {
+    if (this.authService.isLoggedIn()) {
+      console.log('User is already logged in');
+      
+      this.router.navigate(['/subjects']);
+    }
+  }
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
