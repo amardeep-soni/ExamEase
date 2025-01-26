@@ -11,17 +11,19 @@
 
       <!-- Navigation Links -->
       <div class="hidden md:flex items-center space-x-8">
-        <a routerLink="/exam" routerLinkActive="text-primary-600"
-          class="text-gray-700 hover:text-primary-600 transition-colors">
+        <a routerLink="/exam" 
+          routerLinkActive="text-blue-600 font-medium border-b-2 border-blue-600"
+          class="text-gray-700 hover:text-blue-600 transition-colors py-2">
           Exam Schedule
         </a>
-        <a routerLink="/subjects" routerLinkActive="text-primary-600"
-          class="text-gray-700 hover:text-primary-600 transition-colors">
+        <a routerLink="/subjects" 
+          routerLinkActive="text-blue-600 font-medium border-b-2 border-blue-600"
+          class="text-gray-700 hover:text-blue-600 transition-colors py-2">
           Subjects
         </a>
-        <button *ngIf="isLoggedIn" 
+        <button *ngIf="isLoggedIn"
           (click)="logout()"
-          class="text-gray-700 hover:text-primary-600 transition-colors flex items-center">
+          class="text-gray-700 hover:text-blue-600 transition-colors flex items-center">
           <i class="fas fa-sign-out-alt mr-2"></i>
           Logout
         </button>
@@ -29,7 +31,7 @@
 
       <!-- Mobile Menu Button -->
       <div class="md:hidden">
-        <button (click)="toggleMobileMenu()" class="text-gray-700 hover:text-primary-600 focus:outline-none">
+        <button (click)="toggleMobileMenu()" class="text-gray-700 hover:text-blue-600 focus:outline-none">
           <i class="fas fa-bars text-xl"></i>
         </button>
       </div>
@@ -38,17 +40,19 @@
     <!-- Mobile Menu -->
     <div *ngIf="isMobileMenuOpen" class="md:hidden">
       <div class="px-2 pt-2 pb-3 space-y-1">
-        <a routerLink="/study-plan" routerLinkActive="bg-primary-50 text-primary-600"
-          class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">
-          Study Plan
+        <a routerLink="/exam" 
+          routerLinkActive="bg-blue-50 text-blue-600 border-l-4 border-blue-600"
+          class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
+          Exam Schedule
         </a>
-        <a routerLink="/subjects" routerLinkActive="bg-primary-50 text-primary-600"
-          class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">
+        <a routerLink="/subjects" 
+          routerLinkActive="bg-blue-50 text-blue-600 border-l-4 border-blue-600"
+          class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
           Subjects
         </a>
         <button *ngIf="isLoggedIn"
           (click)="logout()"
-          class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">
+          class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
           <i class="fas fa-sign-out-alt mr-2"></i>
           Logout
         </button>
