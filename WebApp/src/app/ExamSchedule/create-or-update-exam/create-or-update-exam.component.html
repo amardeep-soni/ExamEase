@@ -17,34 +17,34 @@
   <form #examForm="ngForm" (ngSubmit)="saveExam()" class="space-y-4">
     <!-- Exam Name -->
     <div class="space-y-2">
-      <label class="block text-gray-700">Exam Name</label>
+      <label class="block text-black">Exam Name</label>
       <input
         type="text"
         [(ngModel)]="exam.examName"
         name="examName"
-        class="w-full p-2 border rounded-lg bg-gray-800 text-white"
+        class="w-full p-2 border rounded-lg bg-white text-black"
       />
     </div>
 
     <!-- Exam Date -->
     <div class="space-y-2">
-      <label class="block text-gray-700">Exam Date</label>
+      <label class="block text-black">Exam Date</label>
       <input
         type="date"
         [(ngModel)]="exam.examDate"
         name="examDate"
-        class="w-full p-2 border rounded-lg bg-gray-800 text-white"
+        class="w-full p-2 border rounded-lg bg-white text-black"
       />
     </div>
 
     <!-- Subjects Section -->
     <div class="space-y-2">
       <div class="flex justify-between items-center">
-        <label class="block text-gray-700">Subjects</label>
+        <label class="block text-black">Subjects</label>
         <button
           type="button"
           (click)="addSubject()"
-          class="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+          class="bg-gray-300 text-black px-3 py-1 rounded-lg text-sm"
         >
           Add Subject
         </button>
@@ -54,15 +54,26 @@
       <div class="space-y-4">
         <div
           *ngFor="let subject of exam.subjects; let i = index"
-          class="space-y-2 p-3 border border-gray-700 rounded-lg"
+          class="space-y-2 p-3 border border-gray-300 rounded-lg"
         >
           <input
             type="text"
             [(ngModel)]="subject.name"
             [name]="'subject' + i"
             placeholder="Subject"
-            class="w-full p-2 border rounded-lg bg-gray-800 text-white"
+            class="w-full p-2 border rounded-lg bg-white text-black"
           />
+
+          <!-- Subject Date -->
+          <div class="space-y-2">
+            <label class="block text-black">Subject Date</label>
+            <input
+              type="date"
+              [(ngModel)]="subject.date"
+              [name]="'subjectDate' + i"
+              class="w-full p-2 border rounded-lg bg-white text-black"
+            />
+          </div>
 
           <!-- Topics -->
           <div>
@@ -75,7 +86,7 @@
                 [(ngModel)]="subject.topics[j]"
                 [name]="'topic' + i + j"
                 placeholder="Topic"
-                class="w-full p-2 border rounded-lg bg-gray-800 text-white"
+                class="w-full p-2 border rounded-lg bg-white text-black"
               />
             </div>
           </div>
@@ -83,7 +94,7 @@
           <button
             type="button"
             (click)="addTopic(i)"
-            class="mt-2 bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+            class="mt-2 bg-gray-300 text-black px-3 py-1 rounded-lg text-sm"
           >
             Add Topic
           </button>

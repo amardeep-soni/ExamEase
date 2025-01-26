@@ -5,9 +5,7 @@ import { API_BASE_URL } from '../service-proxies/service-proxies';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import Aura from '@primeng/themes/aura';
 import { routes } from './app.routes';
-import { providePrimeNG } from 'primeng/config';
 import { ServiceProxyModule } from '../service-proxies/service-proxy.module';
 import { AuthInterceptor } from './services/auth.interceptor';
 

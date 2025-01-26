@@ -5,6 +5,8 @@ import * as ApiServiceProxies from './service-proxies';
     providers: [
         ApiServiceProxies.UserServiceProxy,
         ApiServiceProxies.AuthServiceProxy,
+        ApiServiceProxies.ExamScheduleServiceProxy,
+
     ],
 })
 export class ServiceProxyModule { }
