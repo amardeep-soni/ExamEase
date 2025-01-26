@@ -6,6 +6,8 @@ import * as ApiServiceProxies from './service-proxies';
         ApiServiceProxies.UserServiceProxy,
         ApiServiceProxies.AuthServiceProxy,
         ApiServiceProxies.ExamScheduleServiceProxy,
+        ApiServiceProxies.SubjectServiceProxy,
+        ApiServiceProxies.AiServiceProxy,
 
     ],
 })

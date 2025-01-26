@@ -1,0 +1,75 @@
+<div class="min-h-screen bg-gray-50 p-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Subjects</h1>
+            <button
+                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center"
+                (click)="addSubject()">
+                <i class="fas fa-plus mr-2"></i>
+                Add Subject
+            </button>
+        </div>
+
+        <!-- Loading Skeleton -->
+        <div *ngIf="isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div *ngFor="let i of [1,2,3,4,5,6]" class="bg-white rounded-xl shadow-sm p-6">
+                <div class="space-y-4">
+                    <div class="h-6 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                    <div class="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                    <div class="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actual Content -->
+        <div *ngIf="!isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div *ngFor="let subject of subjects"
+                class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">{{ subject.name }}</h2>
+                        <div class="flex space-x-2">
+                            <button class="text-gray-500 hover:text-blue-500 transition-colors duration-200"
+                                (click)="editSubject(subject.id)">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                            <button class="text-gray-500 hover:text-red-500 transition-colors duration-200"
+                                [disabled]="isDeleting"
+                                (click)="deleteSubject(subject)">
+                                <i class="fas" [class.fa-trash]="!isDeleting" [class.fa-spinner]="isDeleting" [class.fa-spin]="isDeleting"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">{{ subject.description || 'No description available' }}</p>
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="far fa-calendar-alt mr-2"></i>
+                        <span>Created {{ subject.createdDate.toJSDate() | date:'mediumDate' }}</span>
+                    </div>
+                </div>
+                <div *ngIf="subject.fileNames" class="border-t border-gray-100 px-6 py-4">
+                    <div class="flex flex-col space-y-2">
+                        <div class="flex items-center justify-between text-sm text-gray-500">
+                            <i class="far fa-file-pdf mr-2"></i>
+                            <span>{{ subject.fileNames.split(',').length }} PDF files</span>
+                        </div>
+                        <div class="flex flex-col space-y-1">
+                            <div *ngFor="let fileName of subject.fileNames.split(',')" 
+                                (click)="openPdf(fileName.trim())"
+                                class="flex items-center text-sm text-blue-500 hover:text-blue-600 cursor-pointer transition-colors">
+                                <i class="fas fa-external-link-alt mr-2"></i>
+                                <span class="truncate">{{ fileName.trim() }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Results Message -->
+        <div *ngIf="!isLoading && subjects.length === 0" 
+            class="text-center py-12 text-gray-500">
+            <i class="fas fa-folder-open text-4xl mb-4"></i>
+            <p>No subjects found. Create your first subject to get started!</p>
+        </div>
+    </div>
+</div>
