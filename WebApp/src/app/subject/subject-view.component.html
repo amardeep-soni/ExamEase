@@ -1,0 +1,158 @@
+<div class="min-h-[calc(100vh-56px)] bg-gray-50 flex relative overflow-hidden">
+    <!-- Main Content Area -->
+    <div [class]="isChatVisible ? 'w-[calc(100%-24rem)]' : 'w-full'" class="transition-all duration-300">
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto p-6 h-full overflow-hidden">
+            <div class="grid grid-cols-12 gap-6 h-full">
+                <!-- File List Section -->
+                <div class="lg:col-span-4 col-span-12">
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <!-- Navigation Controls -->
+                        <div class="flex items-center mb-6">
+                            <button class="text-gray-600 hover:text-gray-800 transition-colors flex items-center"
+                                routerLink="/subjects">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back
+                            </button>
+                        </div>
+
+                        <!-- Subject Info -->
+                        <div class="mb-6 space-y-3">
+                            <h1 class="text-2xl font-bold text-gray-800">{{ subject?.name }}</h1>
+                            <p class="text-gray-600">{{ subject?.description || 'No description available' }}</p>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="far fa-clock mr-2"></i>
+                                <span>Last updated: {{ subject?.updatedDate | date:'mediumDate' }}</span>
+                            </div>
+                        </div>
+
+                        <!-- PDF Files Section -->
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-folder-open text-blue-500 mr-2"></i>
+                                PDF Files
+                            </h2>
+                            <div class="space-y-2">
+                                <div *ngFor="let file of subject?.fileNames?.split(',')"
+                                    (click)="selectFile(file.trim())"
+                                    class="flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200"
+                                    [class.bg-blue-50]="selectedFile === file.trim()"
+                                    [class.text-blue-600]="selectedFile === file.trim()"
+                                    [class.shadow-sm]="selectedFile === file.trim()"
+                                    [class.hover:bg-gray-50]="selectedFile !== file.trim()">
+                                    <i class="fas fa-file-pdf mr-3"></i>
+                                    <span class="truncate text-sm">{{ file.trim() }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PDF Viewer -->
+                <div class="lg:col-span-8 col-span-12 h-full">
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden h-full">
+                        <div *ngIf="!selectedFile" class="h-full flex items-center justify-center text-gray-500">
+                            <div class="text-center">
+                                <i class="fas fa-file-pdf text-4xl mb-4 text-gray-400"></i>
+                                <p>Select a PDF file to view</p>
+                            </div>
+                        </div>
+                        <iframe *ngIf="selectedFile" [src]="getFileUrl(selectedFile) | safe:'resourceUrl'"
+                            class="w-full h-full border-0">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Chat Sidebar -->
+    <div class="w-96 bg-white border-l shadow-lg absolute right-0 top-0 h-full transition-transform duration-300"
+        [class.translate-x-0]="isChatVisible" [class.translate-x-full]="!isChatVisible">
+        <div class="chat-container">
+            <!-- Chat Header -->
+            <div class="p-4 border-b bg-gray-50">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                        <i class="fas fa-robot text-blue-500 mr-2"></i>
+                        AI Assistant
+                    </h2>
+                    <button (click)="toggleChatView()"
+                        class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <p class="text-sm text-gray-500">Ask questions about the subject materials</p>
+            </div>
+
+            <!-- Messages Container -->
+            <div class="messages-container p-4 space-y-4" #messageContainer>
+                <!-- Welcome Message -->
+                <div *ngIf="messages.length === 0" class="flex justify-center items-center h-full">
+                    <div class="text-center text-gray-500">
+                        <i class="fas fa-comments text-4xl mb-4"></i>
+                        <p>Start a conversation with the AI Assistant</p>
+                        <p class="text-sm mt-2">Ask questions about the subject content</p>
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div *ngFor="let message of messages" class="flex" [class.justify-end]="message.isUser">
+                    <div class="flex items-start max-w-[80%] group">
+                        <div *ngIf="!message.isUser"
+                            class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-2 flex-shrink-0">
+                            <i class="fas fa-robot text-blue-500"></i>
+                        </div>
+                        <div class="rounded-2xl p-4" [class.bg-blue-500]="message.isUser"
+                            [class.text-white]="message.isUser" [class.bg-gray-100]="!message.isUser"
+                            [class.rounded-tr-none]="message.isUser" [class.rounded-tl-none]="!message.isUser">
+                            <div class="text-xs mb-1 opacity-75">
+                                {{ message.isUser ? 'You' : 'AI Assistant' }}
+                            </div>
+                            <div [class.whitespace-pre-wrap]="!message.isUser">{{ message.text }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator -->
+                <div *ngIf="isSendingMessage" class="flex">
+                    <div class="flex items-start max-w-[80%]">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-2">
+                            <i class="fas fa-robot text-blue-500"></i>
+                        </div>
+                        <div class="bg-gray-100 rounded-2xl p-4 rounded-tl-none">
+                            <div class="flex items-center space-x-2">
+                                <div class="typing-indicator">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="p-4 border-t bg-white">
+                <form [formGroup]="chatForm" (ngSubmit)="sendMessage()" class="flex items-center space-x-2">
+                    <input type="text" formControlName="message"
+                        class="flex-1 p-3 border border-gray-200 rounded-full bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all"
+                        placeholder="Ask about this subject..." [disabled]="isSendingMessage" />
+                    <button type="submit"
+                        class="bg-blue-500 text-white p-3 rounded-full hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 flex items-center justify-center w-12 h-12 shadow-lg hover:shadow-xl"
+                        [disabled]="!chatForm.valid || isSendingMessage">
+                        <i class="fas" [class.fa-paper-plane]="!isSendingMessage" [class.fa-spinner]="isSendingMessage"
+                            [class.fa-spin]="isSendingMessage"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Chat Button -->
+    <button *ngIf="!isChatVisible" (click)="toggleChatView()"
+        class="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-blue-500 text-white shadow-lg hover:bg-blue-600 transition-all duration-200 flex items-center justify-center z-50">
+        <i class="fas fa-comments"></i>
+    </button>
+</div>

@@ -79,4 +79,8 @@ export class SubjectListComponent implements OnInit {
     const baseUrl = getRemoteServiceBaseUrl();
     window.open(`${baseUrl}/static/subject/${fileName}`, '_blank');
   }
+
+  viewSubject(id: number): void {
+    this.router.navigate(['/subjects/view', id]);
+  }
 }

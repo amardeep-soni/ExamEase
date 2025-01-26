@@ -30,6 +30,10 @@
                         <h2 class="text-xl font-semibold text-gray-800">{{ subject.name }}</h2>
                         <div class="flex space-x-2">
                             <button class="text-gray-500 hover:text-blue-500 transition-colors duration-200"
+                                (click)="viewSubject(subject.id)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="text-gray-500 hover:text-blue-500 transition-colors duration-200"
                                 (click)="editSubject(subject.id)">
                                 <i class="fas fa-pencil-alt"></i>
                             </button>

@@ -8,6 +8,7 @@ import { ExamDetailsComponent } from './ExamSchedule/exam-details/exam-details.c
 import { StudyPlanComponent } from './study-plan/study-plan.component';
 import { SubjectListComponent } from './subject/subject-list.component';
 import { SubjectFormComponent } from './subject/subject-form.component';
+import { SubjectViewComponent } from './subject/subject-view.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -23,9 +24,5 @@ export const routes: Routes = [
   { path: 'subjects', component: SubjectListComponent },
   { path: 'subjects/create', component: SubjectFormComponent },
   { path: 'subjects/edit/:id', component: SubjectFormComponent },
-
-  
-
-
-
+  { path: 'subjects/view/:id', component: SubjectViewComponent },
 ];
