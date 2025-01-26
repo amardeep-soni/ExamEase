@@ -6,10 +6,10 @@
 
   <!-- Header -->
   <div class="flex justify-between items-center mb-6 bg-white p-4 rounded-lg shadow-sm">
-    <button class="text-gray-600 hover:text-gray-800 flex items-center" routerLink="..">
+    <a class="text-gray-600 hover:text-gray-800 flex items-center" [routerLink]="['../../exam']">
       <span class="material-icons mr-1">arrow_back</span>
       Back
-    </button>
+    </a>
     <h1 class="text-xl font-semibold">{{ isEditMode ? 'Edit' : 'Add' }} Exam Schedule</h1>
     <button 
       class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center disabled:opacity-50"
@@ -69,7 +69,7 @@
         <button 
           type="button" 
           (click)="addSubject()" 
-          class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm flex items-center">
+          class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm flex items-center">
           <span class="material-icons mr-1">add</span>
           Add Subject
         </button>
