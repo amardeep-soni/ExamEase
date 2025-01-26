@@ -17,6 +17,7 @@ export const routes: Routes = [
   { path: 'create-exam', component: CreateOrUpdateExamComponent },
   { path: 'create-exam/:id', component: CreateOrUpdateExamComponent },
   { path: 'studyplan', component: StudyPlanComponent },
+  { path: 'studyplan/:id', component: StudyPlanComponent },
 
   
 

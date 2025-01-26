@@ -18,13 +18,13 @@ interface Exam {
   styleUrl: './exam-list.component.css',
 })
 export class ExamListComponent {
-  exams:ExamScheduleResponse[]=[];
+  exams: ExamScheduleResponse[] = [];
 
   constructor(
     private router: Router,
     private _examScheduleService: ExamScheduleServiceProxy,
     private dialog: MatDialog
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
@@ -47,6 +47,14 @@ export class ExamListComponent {
 
     // Logic to edit exam details
   }
+
+  viewPlan(event: Event, exam: any) {
+    event.stopPropagation(); // Stop the event from bubbling up
+    this.router.navigate(['/studyplan', exam.id]);
+    console.log(exam.id); 
+  }
+
+
 
   deleteExam(exam: any) {
     const dialogRef = this.dialog.open(CustomDeleteDialogComponent, {

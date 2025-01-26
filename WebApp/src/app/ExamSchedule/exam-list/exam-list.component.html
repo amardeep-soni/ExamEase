@@ -6,7 +6,7 @@
     </button>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <div *ngFor="let exam of exams" class="bg-gray-100 p-4 rounded-lg shadow-md">
+    <div *ngFor="let exam of exams" class="bg-gray-100 p-4 rounded-lg shadow-md" (click)="viewPlan($event, exam)" >
       <div class="flex justify-between items-center mb-2">
         <h2 class="text-xl font-semibold">Test</h2>
         <div class="flex space-x-2">

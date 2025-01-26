@@ -6,7 +6,7 @@ import * as ApiServiceProxies from './service-proxies';
         ApiServiceProxies.UserServiceProxy,
         ApiServiceProxies.AuthServiceProxy,
         ApiServiceProxies.ExamScheduleServiceProxy,
-
+        ApiServiceProxies.StudyPlanServiceProxy,
     ],
 })
 export class ServiceProxyModule { }

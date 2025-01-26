@@ -4,8 +4,10 @@
     <button class="back-button">
       <i class="fas fa-arrow-left"></i>
     </button>
-    <h1 class="exam-title">Exam Name</h1>
+    <h1 class="exam-title">Exam Name {{tasksData.examName}}</h1>
     <div class="header-controls">
+      <span class="current-date">{{ formatDate(currentDate) }}</span>
+      <span class="exam-date">Exam: {{displayedTasks[0]?.examDate}}</span>
       <button class="view-toggle" (click)="toggleView()">
         <i class="fas fa-th-large"></i>
       </button>
@@ -25,7 +27,8 @@
 
     <div class="calendar-grid">
       <div class="week" *ngFor="let week of weeks">
-        <div class="day" *ngFor="let date of week" [class.has-tasks]="hasTasksForDate(date) > 0"
+        <div class="day" *ngFor="let date of week" 
+          [class.has-tasks]="hasTasksForDate(date) > 0"
           [class.selected]="selectedDate && date && selectedDate.getDate() === date.getDate()"
           (click)="date && selectDate(date)">
           <span class="date-number">{{date ? date.getDate() : ''}}</span>
@@ -35,6 +38,7 @@
         </div>
       </div>
     </div>
+    
   </div>
 
   <!-- List View -->
@@ -53,7 +57,10 @@
     <!-- Tasks Display -->
     <div class="tasks-container">
       <div *ngFor="let task of displayedTasks" class="task-item">
-        <h3>{{task.subject}}</h3>
+        <div class="task-header">
+          <h3>{{task.subject}}</h3>
+          <span class="card-exam-date">{{task.examDate}}</span>
+        </div>
         <p>Time: {{task.time}}</p>
         <p>Topic: {{task.topic}}</p>
       </div>
@@ -63,5 +70,5 @@
       </div>
     </div>
   </div>
-  
+
 </div>
