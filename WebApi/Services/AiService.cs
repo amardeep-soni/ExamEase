@@ -252,6 +252,7 @@ namespace WebApi.Services
 
         public async Task DeleteDocumentsAsync(List<string> documentIds)
         {
+
             foreach (var documentId in documentIds)
             {
                 await _memory.DeleteDocumentAsync(documentId);
