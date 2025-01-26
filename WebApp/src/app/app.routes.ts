@@ -9,20 +9,21 @@ import { StudyPlanComponent } from './study-plan/study-plan.component';
 import { SubjectListComponent } from './subject/subject-list.component';
 import { SubjectFormComponent } from './subject/subject-form.component';
 import { SubjectViewComponent } from './subject/subject-view.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'dashboard', component: DashboardComponent },
-  { path: 'exam', component: ExamListComponent },
-  { path: 'exam-details/:id', component: ExamDetailsComponent },
-  { path: 'create-exam', component: CreateOrUpdateExamComponent },
-  { path: 'create-exam/:id', component: CreateOrUpdateExamComponent },
-  { path: 'studyplan', component: StudyPlanComponent },
-  { path: 'studyplan/:id', component: StudyPlanComponent },
-  { path: 'subjects', component: SubjectListComponent },
-  { path: 'subjects/create', component: SubjectFormComponent },
-  { path: 'subjects/edit/:id', component: SubjectFormComponent },
-  { path: 'subjects/view/:id', component: SubjectViewComponent },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'exam', component: ExamListComponent, canActivate: [authGuard] },
+  { path: 'exam-details/:id', component: ExamDetailsComponent, canActivate: [authGuard] },
+  { path: 'create-exam', component: CreateOrUpdateExamComponent, canActivate: [authGuard] },
+  { path: 'create-exam/:id', component: CreateOrUpdateExamComponent, canActivate: [authGuard] },
+  { path: 'studyplan', component: StudyPlanComponent, canActivate: [authGuard] },
+  { path: 'studyplan/:id', component: StudyPlanComponent, canActivate: [authGuard] },
+  { path: 'subjects', component: SubjectListComponent, canActivate: [authGuard] },
+  { path: 'subjects/create', component: SubjectFormComponent, canActivate: [authGuard] },
+  { path: 'subjects/edit/:id', component: SubjectFormComponent, canActivate: [authGuard] },
+  { path: 'subjects/view/:id', component: SubjectViewComponent, canActivate: [authGuard] },
 ];

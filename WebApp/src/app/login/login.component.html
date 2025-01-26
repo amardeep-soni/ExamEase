@@ -38,12 +38,16 @@
         />
       </div>
 
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+        {{ errorMessage }}
+      </div>
+
       <!-- Login Button -->
-      <button
-        type="submit"
-        class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
-      >
-        Sign In
+      <button type="submit" [disabled]="loginForm.invalid || isLoading"
+        class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200 flex items-center justify-center">
+        <i *ngIf="isLoading" class="fas fa-spinner fa-spin mr-2"></i>
+        {{ isLoading ? 'Signing in...' : 'Sign In' }}
       </button>
 
       <!-- Forgot Password Link -->
@@ -55,7 +59,7 @@
 
     <!-- Register Redirect -->
     <p class="text-sm text-center text-gray-600 mt-6">
-      Don’t have an account?
+      Don't have an account?
       <a href="/register" class="text-blue-600 hover:underline">Sign up</a>
     </p>
   </div>

@@ -40,30 +40,30 @@ export class LoginComponent {
 
   async onSubmit(form: NgForm) {
     if (form.valid) {
-      console.log('Login form data:', this.loginData);
+      this.isLoading = true;
+      this.errorMessage = '';
 
       try {
-        // Implement your login logic here
-        console.log('Login attempt with:', this.loginData);
-        this._authService.login(this.loginData).subscribe((res) => {
-          console.log('Login response:', res);
-          if (res.isError === 'false') {
-            if (res.message) {
+        this._authService.login(this.loginData).subscribe({
+          next: (res) => {
+            if (res.isError === 'false' && res.message) {
               this.authService.setToken(res.message);
+              this.router.navigate(['/dashboard']);
             } else {
-              this.errorMessage = 'Login failed: No token received';
+              this.errorMessage = res.message || 'Login failed. Please try again.';
             }
-          } else {
-            this.errorMessage = 'Login failed: No token received';
+          },
+          error: (error) => {
+            console.error('Login error:', error);
+            this.errorMessage = 'An error occurred during login. Please try again.';
+          },
+          complete: () => {
+            this.isLoading = false;
           }
-          this.router.navigate(['/dashboard']);
         });
-
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1500));
       } catch (error) {
-        this.errorMessage = 'Invalid email or password';
-      } finally {
+        console.error('Login error:', error);
+        this.errorMessage = 'An unexpected error occurred. Please try again.';
         this.isLoading = false;
       }
     }
