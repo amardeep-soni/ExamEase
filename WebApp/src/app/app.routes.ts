@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './login/login.component';   
+import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 
 import { ExamListComponent } from './ExamSchedule/exam-list/exam-list.component';
@@ -10,9 +10,11 @@ import { SubjectListComponent } from './subject/subject-list.component';
 import { SubjectFormComponent } from './subject/subject-form.component';
 import { SubjectViewComponent } from './subject/subject-view.component';
 import { authGuard } from './guards/auth.guard';
+import { LandingComponent } from './landing/landing.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '', redirectTo: '/landing', pathMatch: 'full' },
+  { path: 'landing', component: LandingComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'exam', component: ExamListComponent, canActivate: [authGuard] },

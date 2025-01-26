@@ -1,0 +1,60 @@
+/* Hero Section Styles */
+.hero-section {
+  @apply bg-gradient-to-br from-white to-blue-50;
+}
+
+/* Button Styles */
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200;
+}
+
+.btn-secondary {
+  @apply bg-white hover:bg-gray-50 text-blue-600 px-8 py-3 rounded-lg font-medium border border-blue-600 transition-colors duration-200;
+}
+
+.btn-white {
+  @apply bg-white hover:bg-gray-100 text-blue-600 px-8 py-3 rounded-lg font-medium transition-colors duration-200;
+}
+
+/* Feature Card Styles */
+.feature-card {
+  @apply bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200;
+}
+
+.icon-wrapper {
+  @apply w-12 h-12 rounded-lg flex items-center justify-center mb-4;
+}
+
+.material-icons {
+  @apply text-2xl;
+}
+
+/* Step Card Styles */
+.step-card {
+  @apply text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200;
+}
+
+.step-number {
+  @apply w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-bold mx-auto mb-4;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .hero-section {
+    @apply text-center;
+  }
+  
+  .btn-container {
+    @apply justify-center;
+  }
+}
+
+/* Animation Styles */
+.feature-card, .step-card {
+  @apply transform hover:-translate-y-1 transition-transform duration-200;
+}
+
+/* Additional Utility Classes */
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600;
+} 

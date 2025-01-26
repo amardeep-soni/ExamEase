@@ -1,0 +1,131 @@
+<div class="landing-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col lg:flex-row items-center justify-between py-20">
+        <div class="lg:w-1/2 mb-10 lg:mb-0">
+          <h1 class="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
+            Master Your Exams with 
+            <span class="text-blue-600">AI-Powered</span> Study Plans
+          </h1>
+          <p class="text-lg text-gray-600 mb-8">
+            Transform your exam preparation journey with personalized study schedules, 
+            intelligent planning, and AI-assisted learning support.
+          </p>
+          <div class="flex gap-4">
+            <button 
+              class="btn-primary"
+              [routerLink]="['/register']">
+              Get Started Free
+            </button>
+            <button 
+              class="btn-secondary"
+              [routerLink]="['/login']">
+              Sign In
+            </button>
+          </div>
+        </div>
+        <div class="lg:w-1/2">
+          <img 
+            src="landing.png" 
+            alt="Study Planning Illustration" 
+            class="w-full max-w-lg mx-auto"
+          >
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section bg-gray-50">
+    <div class="container mx-auto px-4 py-20">
+      <h2 class="text-3xl lg:text-4xl font-bold text-center mb-16">
+        Everything You Need for Exam Success
+      </h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Feature Card 1 -->
+        <div class="feature-card">
+          <div class="icon-wrapper bg-blue-100 text-blue-600">
+            <span class="material-icons">schedule</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Smart Study Planning</h3>
+          <p class="text-gray-600">
+            AI-generated study schedules tailored to your exam dates and daily availability.
+          </p>
+        </div>
+
+        <!-- Feature Card 2 -->
+        <div class="feature-card">
+          <div class="icon-wrapper bg-green-100 text-green-600">
+            <span class="material-icons">psychology</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">AI Study Assistant</h3>
+          <p class="text-gray-600">
+            Get instant help with your queries using our intelligent chat interface.
+          </p>
+        </div>
+
+        <!-- Feature Card 3 -->
+        <div class="feature-card">
+          <div class="icon-wrapper bg-purple-100 text-purple-600">
+            <span class="material-icons">library_books</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Resource Management</h3>
+          <p class="text-gray-600">
+            Organize your study materials and track progress efficiently.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works-section">
+    <div class="container mx-auto px-4 py-20">
+      <h2 class="text-3xl lg:text-4xl font-bold text-center mb-16">
+        How ExamEase Works
+      </h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h4 class="text-lg font-semibold mb-2">Create Schedule</h4>
+          <p class="text-gray-600">Add your exam details and study preferences</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h4 class="text-lg font-semibold mb-2">Get AI Plan</h4>
+          <p class="text-gray-600">Receive personalized study schedule</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h4 class="text-lg font-semibold mb-2">Study Smart</h4>
+          <p class="text-gray-600">Follow your optimized study plan</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h4 class="text-lg font-semibold mb-2">Excel</h4>
+          <p class="text-gray-600">Achieve your exam goals</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section bg-blue-600">
+    <div class="container mx-auto px-4 py-16">
+      <div class="text-center text-white">
+        <h2 class="text-3xl lg:text-4xl font-bold mb-6">
+          Ready to Transform Your Study Experience?
+        </h2>
+        <p class="text-xl mb-8">
+          Join thousands of students achieving their academic goals with ExamEase
+        </p>
+        <button 
+          class="btn-white"
+          [routerLink]="['/register']">
+          Get Started Now
+        </button>
+      </div>
+    </div>
+  </section>
+</div> 
