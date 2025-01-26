@@ -3,13 +3,13 @@
   <div class="space-y-2 mb-6">
     <div class="text-lg">
       <span class="text-gray-400">Exam Name:</span> 
-      {{ exam.examName }}
+      {{ examData?.examName }}
     </div>
     <div class="flex items-center gap-2">
       <span class="text-gray-400">
         <i class="material-icons">calendar_today</i> Date:
       </span>
-      {{ exam.date | date:'d MMM yyyy' }}
+      {{ examData?.examDate?.toJSDate() | date }}
     </div>
     <div class="flex items-center gap-2">
       <span class="text-gray-400">
@@ -26,9 +26,9 @@
   </div>
 
   <!-- Schedule Items -->
-  <div *ngFor="let subject of exam.subjects" class="bg-gray-800 p-4 rounded-lg mb-2">
-    <div class="font-medium">{{ subject.name }}</div>
-    <div class="text-gray-300">{{ subject.topics.join(', ') }}</div>
-    <div class="text-gray-400">{{ subject.date | date:'yyyy/MM/dd' }}</div>
+  <div *ngFor="let subject of examData?.examSubjectTimes" class="bg-gray-800 p-4 rounded-lg mb-2">
+    <div class="font-medium">{{ subject.subject }}</div>
+    <div class="text-gray-300">{{ subject.topicOrChapter }}</div>
+    <div class="text-gray-400">{{ subject?.examDateTime?.toJSDate() | date }}</div>
   </div>
 </div>
