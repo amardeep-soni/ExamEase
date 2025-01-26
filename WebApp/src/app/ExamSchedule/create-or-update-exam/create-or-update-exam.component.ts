@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DateTime } from 'luxon';
 import { finalize } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   ExamScheduleRequest,
   ExamScheduleServiceProxy,
@@ -36,12 +35,12 @@ export class CreateOrUpdateExamComponent implements OnInit {
   isLoading = false;
   isEditMode = false;
   examId: number | null = null;
+  errorMessage: string | null = null;
 
   constructor(
     private _examScheduleService: ExamScheduleServiceProxy,
     private activatedRoute: ActivatedRoute,
-    private router: Router,
-    private snackBar: MatSnackBar
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -72,7 +71,7 @@ export class CreateOrUpdateExamComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error loading exam:', error);
-          this.snackBar.open('Failed to load exam details', 'Close', { duration: 3000 });
+          this.errorMessage = 'Failed to load exam details';
         }
       });
   }
@@ -95,15 +94,16 @@ export class CreateOrUpdateExamComponent implements OnInit {
 
   validateForm(): boolean {
     if (!this.exam.examName || !this.exam.examDate || this.exam.dailyStudyHours <= 0) {
-      this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
+      this.errorMessage = 'Please fill in all required fields';
       return false;
     }
 
     if (this.exam.subjects.length === 0) {
-      this.snackBar.open('Please add at least one subject', 'Close', { duration: 3000 });
+      this.errorMessage = 'Please add at least one subject';
       return false;
     }
 
+    this.errorMessage = null;
     return true;
   }
 
@@ -135,13 +135,11 @@ export class CreateOrUpdateExamComponent implements OnInit {
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: () => {
-          const message = this.isEditMode ? 'Exam updated successfully!' : 'Exam created successfully!';
-          this.snackBar.open(message, 'Close', { duration: 3000 });
           this.router.navigate(['/exam']);
         },
         error: (error) => {
           console.error('Error saving exam:', error);
-          this.snackBar.open('Failed to save exam', 'Close', { duration: 3000 });
+          this.errorMessage = 'Failed to save exam';
         }
       });
   }

@@ -22,6 +22,11 @@
 
   <!-- Form -->
   <form #examForm="ngForm" (ngSubmit)="saveExam()" class="space-y-6">
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+      {{ errorMessage }}
+    </div>
+
     <!-- Basic Info Section -->
     <div class="bg-white p-6 rounded-lg shadow-sm">
       <h2 class="text-lg font-medium mb-4 pb-2 border-b">Basic Information</h2>
