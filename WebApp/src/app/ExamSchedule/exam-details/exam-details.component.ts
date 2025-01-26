@@ -1,39 +1,31 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { ExamScheduleResponse, ExamScheduleServiceProxy } from '../../../service-proxies/service-proxies';
+import { ServiceProxyModule } from '../../../service-proxies/service-proxy.module';
 
 @Component({
   selector: 'app-exam-details',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ServiceProxyModule,DatePipe],
   templateUrl: './exam-details.component.html',
   styleUrl: './exam-details.component.css'
 })
 export class ExamDetailsComponent {
 
-exam = {
-  examName: 'Final Exam',
-  date: '2025-01-05',
-  subjects: [
-    {
-      name: 'Physics',
-      topics: ['Mechanics', 'Optics'],
-      date: '2025-02-08'
-    },
-    {
-      name: 'Chemistry',
-      topics: ['Organic Chemistry', 'Inorganic Chemistry'],
-      date: '2025-02-09'
-    },
-    {
-      name: 'Mathematics',
-      topics: ['Algebra', 'Calculus'],
-      date: '2025-02-10'
-    },
-    {
-      name: 'Biology',
-      topics: ['Genetics', 'Ecology'],
-      date: '2025-02-11'
-    }
-  ]
-};
+  examData:ExamScheduleResponse | undefined
+  constructor(private route: ActivatedRoute, private _examScheduleService: ExamScheduleServiceProxy,) { }
+
+  ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      console.log('Exam ID from URL:', id);
+      this._examScheduleService.getExamSchedule(Number(id)).subscribe((exam) => {
+        console.log('Raw API response:', exam); // For debugging
+        this.examData = exam;
+      
+      });
+    });
+  }
+
 }

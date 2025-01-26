@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { ExamScheduleServiceProxy } from '../../../service-proxies/service-proxies';
+import { ExamScheduleResponse, ExamScheduleServiceProxy } from '../../../service-proxies/service-proxies';
 import { ServiceProxyModule } from '../../../service-proxies/service-proxy.module';
 import { CustomDeleteDialogComponent } from '../../dialogs/custom-delete-dialog/custom-delete-dialog.component';
 
@@ -18,11 +18,7 @@ interface Exam {
   styleUrl: './exam-list.component.css',
 })
 export class ExamListComponent {
-  exams: Exam[] = [
-    { name: 'Math Exam', date: new Date('2023-11-01') },
-    { name: 'Science Exam', date: new Date('2023-11-15') },
-    { name: 'History Exam', date: new Date('2023-12-01') },
-  ];
+  exams:ExamScheduleResponse[]=[];
 
   constructor(
     private router: Router,
@@ -35,24 +31,24 @@ export class ExamListComponent {
     //Add 'implements OnInit' to the class.
     this._examScheduleService.getExamSchedules().subscribe((exams) => {
       console.log(exams);
-      // this.exams = exams;
+      this.exams = exams;
     });
   }
   addExam() {
     this.router.navigate(['/create-exam']);
   }
 
-  viewExam(exam: Exam) {
-    this.router.navigate(['/create-exam', 0]);
+  viewExam(exam: any) {
+    this.router.navigate(['/exam-details', exam.id]);
   }
 
-  editExam(exam: Exam) {
-    this.router.navigate(['/create-exam', 0]);
+  editExam(exam: any) {
+    this.router.navigate(['/create-exam', exam.id]);
 
     // Logic to edit exam details
   }
 
-  deleteExam(exam: Exam) {
+  deleteExam(exam: any) {
     const dialogRef = this.dialog.open(CustomDeleteDialogComponent, {
       width: '400px',
       data: { examName: exam.name }
@@ -61,16 +57,16 @@ export class ExamListComponent {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         // Proceed with deletion
-        // this._examScheduleService.deleteExamSchedule(exam.id).subscribe(
-        //   () => {
-        //     console.log('Exam deleted successfully');
-        //     // Refresh the exam list
-        //     this.ngOnInit();
-        //   },
-        //   error => {
-        //     console.error('Error deleting exam:', error);
-        //   }
-        // );
+        this._examScheduleService.deleteExamSchedule(exam.id).subscribe(
+          () => {
+            console.log('Exam deleted successfully');
+            // Refresh the exam list
+            this.ngOnInit();
+          },
+          error => {
+            console.error('Error deleting exam:', error);
+          }
+        );
       }
     });
   }
