@@ -1712,6 +1712,7 @@ export interface IAddDataRequest {
 }
 
 export class ExamScheduleRequest implements IExamScheduleRequest {
+    examName!: string | undefined;
     dailyStudyHours!: number;
     examDate!: DateTime;
     examSubjectTimes!: ExamSubjectTimeDto[] | undefined;
@@ -1727,6 +1728,7 @@ export class ExamScheduleRequest implements IExamScheduleRequest {
 
     init(_data?: any) {
         if (_data) {
+            this.examName = _data["examName"];
             this.dailyStudyHours = _data["dailyStudyHours"];
             this.examDate = _data["examDate"] ? DateTime.fromISO(_data["examDate"].toString()) : <any>undefined;
             if (Array.isArray(_data["examSubjectTimes"])) {
@@ -1746,6 +1748,7 @@ export class ExamScheduleRequest implements IExamScheduleRequest {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["examName"] = this.examName;
         data["dailyStudyHours"] = this.dailyStudyHours;
         data["examDate"] = this.examDate ? this.examDate.toString() : <any>undefined;
         if (Array.isArray(this.examSubjectTimes)) {
@@ -1758,6 +1761,7 @@ export class ExamScheduleRequest implements IExamScheduleRequest {
 }
 
 export interface IExamScheduleRequest {
+    examName: string | undefined;
     dailyStudyHours: number;
     examDate: DateTime;
     examSubjectTimes: ExamSubjectTimeDto[] | undefined;
@@ -1765,6 +1769,7 @@ export interface IExamScheduleRequest {
 
 export class ExamScheduleResponse implements IExamScheduleResponse {
     id!: number;
+    examName!: string | undefined;
     email!: string | undefined;
     dailyStudyHours!: number;
     examDate!: DateTime;
@@ -1783,6 +1788,7 @@ export class ExamScheduleResponse implements IExamScheduleResponse {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.examName = _data["examName"];
             this.email = _data["email"];
             this.dailyStudyHours = _data["dailyStudyHours"];
             this.examDate = _data["examDate"] ? DateTime.fromISO(_data["examDate"].toString()) : <any>undefined;
@@ -1805,6 +1811,7 @@ export class ExamScheduleResponse implements IExamScheduleResponse {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["examName"] = this.examName;
         data["email"] = this.email;
         data["dailyStudyHours"] = this.dailyStudyHours;
         data["examDate"] = this.examDate ? this.examDate.toString() : <any>undefined;
@@ -1820,6 +1827,7 @@ export class ExamScheduleResponse implements IExamScheduleResponse {
 
 export interface IExamScheduleResponse {
     id: number;
+    examName: string | undefined;
     email: string | undefined;
     dailyStudyHours: number;
     examDate: DateTime;

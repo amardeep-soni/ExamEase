@@ -39,6 +39,7 @@ namespace WebApi.Repositories
                     throw new KeyNotFoundException($"ExamSchedule with ID {id} not found");
 
                 examSchedule.Email = _userContextService.GetUserEmail();
+                examSchedule.ExamName = request.ExamName;
                 examSchedule.DailyStudyHours = request.DailyStudyHours;
                 examSchedule.ExamDate = request.ExamDate;
 
@@ -59,6 +60,7 @@ namespace WebApi.Repositories
                 // Create new schedule
                 examSchedule = new ExamSchedule
                 {
+                    ExamName = request.ExamName,
                     Email = _userContextService.GetUserEmail(),
                     DailyStudyHours = request.DailyStudyHours,
                     ExamDate = request.ExamDate,
@@ -153,6 +155,7 @@ namespace WebApi.Repositories
             return new ExamScheduleResponse
             {
                 Id = schedule.Id,
+                ExamName = schedule.ExamName,
                 Email = schedule.Email,
                 DailyStudyHours = schedule.DailyStudyHours,
                 ExamDate = schedule.ExamDate,

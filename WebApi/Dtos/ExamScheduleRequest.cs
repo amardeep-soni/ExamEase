@@ -2,6 +2,7 @@
 {
     public class ExamScheduleRequest
     {
+        public string ExamName { get; set; }
         public int DailyStudyHours { get; set; }
         public DateTime ExamDate { get; set; }
         public List<ExamSubjectTimeDto> ExamSubjectTimes { get; set; }
