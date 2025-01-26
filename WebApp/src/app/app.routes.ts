@@ -5,6 +5,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { ExamListComponent } from './ExamSchedule/exam-list/exam-list.component';
 import { CreateOrUpdateExamComponent } from './ExamSchedule/create-or-update-exam/create-or-update-exam.component';
 import { ExamDetailsComponent } from './ExamSchedule/exam-details/exam-details.component';
+import { StudyPlanComponent } from './study-plan/study-plan.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -15,6 +16,8 @@ export const routes: Routes = [
   { path: 'exam-details/:id', component: ExamDetailsComponent },
   { path: 'create-exam', component: CreateOrUpdateExamComponent },
   { path: 'create-exam/:id', component: CreateOrUpdateExamComponent },
+  { path: 'studyplan', component: StudyPlanComponent },
+
   
 
 
