@@ -6,6 +6,8 @@ import { ExamListComponent } from './ExamSchedule/exam-list/exam-list.component'
 import { CreateOrUpdateExamComponent } from './ExamSchedule/create-or-update-exam/create-or-update-exam.component';
 import { ExamDetailsComponent } from './ExamSchedule/exam-details/exam-details.component';
 import { StudyPlanComponent } from './study-plan/study-plan.component';
+import { SubjectListComponent } from './subject/subject-list.component';
+import { SubjectFormComponent } from './subject/subject-form.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -18,6 +20,9 @@ export const routes: Routes = [
   { path: 'create-exam/:id', component: CreateOrUpdateExamComponent },
   { path: 'studyplan', component: StudyPlanComponent },
   { path: 'studyplan/:id', component: StudyPlanComponent },
+  { path: 'subjects', component: SubjectListComponent },
+  { path: 'subjects/create', component: SubjectFormComponent },
+  { path: 'subjects/edit/:id', component: SubjectFormComponent },
 
   
 

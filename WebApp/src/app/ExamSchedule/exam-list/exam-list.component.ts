@@ -59,7 +59,7 @@ export class ExamListComponent {
   deleteExam(exam: any) {
     const dialogRef = this.dialog.open(CustomDeleteDialogComponent, {
       width: '400px',
-      data: { examName: exam.name }
+      data: { title: 'Delete Exam', message: `Are you sure you want to delete ${exam.name}?` }
     });
 
     dialogRef.afterClosed().subscribe(result => {

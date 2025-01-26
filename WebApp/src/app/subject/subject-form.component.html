@@ -1,0 +1,92 @@
+<div class="min-h-screen bg-gray-50 p-6">
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6">
+        <!-- Loading Skeleton -->
+        <div *ngIf="isLoading" class="space-y-4">
+            <div class="h-8 bg-gray-200 rounded animate-pulse"></div>
+            <div class="h-12 bg-gray-200 rounded animate-pulse"></div>
+            <div class="h-32 bg-gray-200 rounded animate-pulse"></div>
+        </div>
+
+        <!-- Actual Content -->
+        <div *ngIf="!isLoading">
+            <div class="flex justify-between items-center mb-8">
+                <button class="text-gray-600 hover:text-gray-800 transition-colors" routerLink="/subjects">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back
+                </button>
+                <h1 class="text-2xl font-bold text-gray-800">{{ isEditMode ? 'Edit' : 'Create' }} Subject</h1>
+                <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors duration-200 flex items-center"
+                    [disabled]="isSaving"
+                    (click)="onSubmit()">
+                    <i class="fas" [class.fa-save]="!isSaving" [class.fa-spinner]="isSaving" [class.fa-spin]="isSaving"></i>
+                    <span class="ml-2">{{ isSaving ? 'Saving...' : 'Save' }}</span>
+                </button>
+            </div>
+
+            <form [formGroup]="subjectForm" class="space-y-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Subject Name *</label>
+                    <input type="text" formControlName="name"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" />
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea formControlName="description" rows="4"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"></textarea>
+                </div>
+
+                <!-- Drag and Drop Zone -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">PDF Files</label>
+                    <div [class.border-blue-500]="isDragging"
+                        class="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 hover:border-blue-400"
+                        (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-600">Drag and drop PDF files here or</p>
+                        <label class="mt-2 inline-block bg-blue-50 text-blue-500 px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors duration-200">
+                            <input type="file" multiple accept=".pdf" (change)="onFileSelected($event)" class="hidden" />
+                            Browse Files
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Existing Files -->
+                <div *ngIf="existingFiles.length > 0" class="space-y-4">
+                    <h3 class="font-semibold text-gray-700">Existing Files</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div *ngFor="let file of existingFiles"
+                            class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                            <div class="flex items-center flex-1 cursor-pointer" (click)="openPdf(file)">
+                                <i class="fas fa-file-pdf text-red-500 mr-3"></i>
+                                <span class="text-gray-700 truncate hover:text-blue-500 transition-colors">{{ file }}</span>
+                            </div>
+                            <button (click)="removeExistingFile(file)"
+                                class="text-red-500 hover:text-red-600 transition-colors duration-200 ml-3">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New Files -->
+                <div *ngIf="newFiles.length > 0" class="space-y-4">
+                    <h3 class="font-semibold text-gray-700">New Files to Upload</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div *ngFor="let file of newFiles"
+                            class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-pdf text-red-500 mr-3"></i>
+                                <span class="text-gray-700 truncate">{{ file.name }}</span>
+                            </div>
+                            <button (click)="removeNewFile(file)"
+                                class="text-red-500 hover:text-red-600 transition-colors duration-200">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
