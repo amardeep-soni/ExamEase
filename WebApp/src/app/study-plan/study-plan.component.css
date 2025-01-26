@@ -1,27 +1,13 @@
 .study-plan-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-    background-color: #ffffff;
-    min-height: 100vh;
+    @apply max-w-7xl mx-auto p-6;
 }
 
 .top-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    background-color: #f5f5f5;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    @apply flex justify-between items-center mb-6 bg-white rounded-lg shadow-sm p-4;
 }
 
 .exam-title {
-    color: #333333;
-    margin: 0;
-    font-size: 24px;
-    font-weight: 600;
+    @apply text-2xl font-bold text-gray-800;
 }
 
 .exam-date {
@@ -31,23 +17,11 @@
   }
   
   .header-controls {
-    display: flex;
-    align-items: center;
-  }
-
-.back-button {
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    color: #333333;
-    padding: 10px 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    @apply flex gap-2;
 }
 
-.back-button:hover {
-    background-color: #f8f8f8;
-    transform: translateY(-1px);
+.back-button {
+    @apply text-gray-600 hover:text-gray-800 flex items-center p-2 hover:bg-gray-100 rounded-lg transition-colors;
 }
 
 .header-controls {
@@ -73,36 +47,15 @@
 }
 
 .date-navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    background-color: #f5f5f5;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+    @apply flex items-center justify-between mb-6 bg-gray-50 p-4 rounded-lg;
 }
 
 .nav-button {
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    color: #333333;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 8px 16px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.nav-button:hover {
-    background-color: #f8f8f8;
-    transform: translateY(-1px);
+    @apply p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors;
 }
 
 .current-date {
-    font-size: 18px;
-    font-weight: 500;
-    color: #333333;
+    @apply text-lg font-medium text-gray-800 block;
 }
 
 .task-list {
@@ -124,16 +77,11 @@
 }
 
 .task-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
+    @apply flex items-center gap-2 mb-4;
 }
 
 .task-header h3 {
-    color: #333333;
-    font-size: 1.2rem;
-    font-weight: 500;
+    @apply text-lg font-medium text-gray-800;
 }
 
 .task-date {
@@ -158,12 +106,8 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .study-plan-container {
-        padding: 1rem;
-    }
-
     .tasks-container {
-        grid-template-columns: 1fr;
+        @apply grid-cols-1;
     }
 
     .top-header {
@@ -179,102 +123,85 @@
 }
 
 .calendar-view {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    @apply bg-white rounded-lg shadow-sm p-6;
 }
 
-.calendar-header {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    font-weight: 500;
-    color: #333333;
-    padding: 10px 0;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    margin-bottom: 15px;
+.calendar-container {
+  @apply bg-white rounded-lg shadow-sm overflow-hidden;
 }
 
-.calendar-grid .week {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
-    margin-bottom: 8px;
+.weekdays-header {
+  @apply grid grid-cols-7 bg-gray-50 border-b border-gray-200;
 }
 
-.calendar-grid .day {
-    aspect-ratio: 1;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 10px;
-    position: relative;
-    cursor: pointer;
-    background-color: #ffffff;
-    transition: all 0.2s ease;
+.weekday {
+  @apply py-3 text-center text-sm font-medium text-gray-600;
 }
 
-.calendar-grid .day:hover {
-    background-color: #f8f8f8;
-    transform: translateY(-2px);
+.calendar-grid {
+  @apply grid auto-rows-fr border-collapse;
 }
 
-.calendar-grid .day.has-tasks {
-    background-color: #f5f5f5;
-    border-color: #d0d0d0;
+.week {
+  @apply grid grid-cols-7;
 }
 
-.calendar-grid .day.selected {
-    background-color: #e8e8e8;
-    border-color: #c0c0c0;
+.day {
+  @apply relative h-32 p-2 border border-gray-200 hover:bg-gray-50 transition-colors;
 }
 
-.day .date-number {
-    color: #333333;
-    font-weight: 500;
+.day.other-month {
+  @apply bg-gray-50/50;
 }
 
-.day .task-count {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    background-color: #666666;
-    color: #ffffff;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
+.day.other-month .date-number {
+  @apply text-gray-400;
+}
+
+.day.has-tasks {
+  @apply bg-blue-50/70;
+}
+
+.day.selected {
+  @apply ring-2 ring-blue-500 ring-inset bg-blue-50/30;
+}
+
+.day.today {
+  @apply bg-yellow-50/50;
+}
+
+.date-number {
+  @apply inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-medium text-gray-700;
+}
+
+.today .date-number {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.task-preview {
+  @apply mt-2 space-y-1 max-h-[80px] overflow-hidden;
+}
+
+.task-preview-item {
+  @apply flex items-center gap-1 px-2 py-1 text-xs bg-white rounded border border-gray-100 shadow-sm;
+}
+
+.more-tasks {
+  @apply text-xs text-blue-600 font-medium mt-1 text-center;
 }
 
 /* List View Styles */
 .list-view {
-    background-color: #ffffff;
-    color: #333333;
-    padding: 20px;
-    min-height: 100vh;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    @apply bg-white rounded-lg shadow-sm p-6;
 }
 
 /* Tasks Container Styles */
 .tasks-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    padding: 10px;
+    @apply grid gap-4 md:grid-cols-2 lg:grid-cols-3;
 }
 
 .task-item {
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 20px;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+    @apply bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all;
 }
 
 .task-item:hover {
@@ -287,7 +214,6 @@
     font-size: 18px;
     color: #333333;
     font-weight: 600;
-    margin-bottom: 12px;
 }
 
 .task-item p {
@@ -301,27 +227,172 @@
 
 /* View Toggle Buttons */
 .view-toggle, .calendar-toggle {
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    color: #333333;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    @apply p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors;
 }
 
-.view-toggle:hover, .calendar-toggle:hover {
-    background-color: #f8f8f8;
-    transform: translateY(-1px);
+.view-toggle.active {
+    @apply bg-blue-50 text-blue-600;
 }
 
 /* No Tasks Message */
 .no-tasks {
-    text-align: center;
-    color: #666666;
-    padding: 30px;
-    background-color: #f8f8f8;
-    border-radius: 8px;
-    font-size: 16px;
-    grid-column: 1 / -1;
+    @apply col-span-full text-center py-12;
+}
+
+.task-indicators {
+    @apply mt-2;
+}
+
+.task-count {
+    @apply text-xs bg-blue-600 text-white px-2 py-1 rounded-full;
+}
+
+.task-preview {
+    @apply mt-2 space-y-1;
+}
+
+.task-preview-item {
+    @apply text-xs text-gray-600 truncate;
+}
+
+.more-tasks {
+    @apply text-xs text-blue-600 font-medium;
+}
+
+.current-date-info {
+    @apply text-center;
+}
+
+.task-content {
+    @apply space-y-2;
+}
+
+.task-info {
+    @apply flex items-center gap-2 text-gray-600;
+}
+
+/* Add these new styles */
+.task-badge {
+  @apply px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium;
+}
+
+.task-count-badge {
+  @apply text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full mt-1 inline-block;
+}
+
+.topic-chip {
+  @apply flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg text-gray-700 text-sm;
+}
+
+.task-topics {
+  @apply mt-4 space-y-2;
+}
+
+.calendar-grid {
+  @apply border border-gray-200 rounded-lg overflow-hidden;
+}
+
+.week {
+  @apply grid grid-cols-7 border-b border-gray-200 last:border-b-0;
+}
+
+.day {
+  @apply relative p-3 border-r border-gray-200 last:border-r-0 min-h-[120px] hover:bg-gray-50 transition-colors;
+}
+
+.day.other-month {
+  @apply bg-gray-50 text-gray-400;
+}
+
+.day.has-tasks {
+  @apply bg-blue-50;
+}
+
+.day.selected {
+  @apply border-blue-500 ring-2 ring-blue-200;
+}
+
+.day.today {
+  @apply bg-yellow-50 border-yellow-300;
+}
+
+.date-number {
+  @apply text-sm font-medium;
+}
+
+.today .date-number {
+  @apply bg-yellow-200 text-yellow-800;
+}
+
+.task-preview {
+  @apply mt-3 space-y-1;
+}
+
+.task-preview-item {
+  @apply flex items-center gap-1 px-2 py-1 rounded bg-white shadow-sm text-sm;
+}
+
+.more-tasks {
+  @apply text-xs text-blue-600 font-medium mt-2 text-center;
+}
+
+/* Update/add these styles */
+.calendar-nav {
+  @apply mb-6;
+}
+
+.weekdays-header {
+  @apply grid grid-cols-7 bg-gray-50 border-b border-gray-200 bg-gray-50 rounded-t-lg;
+}
+
+.weekday {
+  @apply py-3 text-center text-sm font-medium text-gray-600;
+}
+
+.calendar-grid {
+  @apply grid gap-px bg-gray-200;
+}
+
+.week {
+  @apply grid grid-cols-7 bg-white;
+}
+
+.day {
+  @apply relative p-3 bg-white hover:bg-gray-50 transition-colors min-h-[120px];
+}
+
+.day.other-month {
+  @apply bg-gray-50 text-gray-400;
+}
+
+.day.has-tasks {
+  @apply bg-blue-50;
+}
+
+.day.selected {
+  @apply ring-2 ring-blue-500 ring-inset;
+}
+
+.day.today {
+  @apply bg-yellow-50;
+}
+
+.date-number {
+  @apply inline-block px-2 py-1 rounded-full text-sm font-medium;
+}
+
+.today .date-number {
+  @apply bg-yellow-200 text-yellow-800;
+}
+
+.task-preview {
+  @apply mt-2 space-y-1;
+}
+
+.task-preview-item {
+  @apply flex items-center gap-1 px-2 py-1 rounded bg-white shadow-sm text-sm;
+}
+
+.more-tasks {
+  @apply text-xs text-blue-600 font-medium mt-2 text-center;
 }
