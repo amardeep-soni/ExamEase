@@ -1,0 +1,13 @@
+.material-icons {
+  font-size: 20px;
+  line-height: 1;
+}
+
+input:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.loading-spinner {
+  border-top-color: #3b82f6;
+}

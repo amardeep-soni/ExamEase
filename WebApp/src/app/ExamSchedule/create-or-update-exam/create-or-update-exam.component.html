@@ -1,72 +1,148 @@
-<div class="p-4 w-full">
+<div class="p-4 max-w-4xl mx-auto">
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+
   <!-- Header -->
-  <div class="flex justify-between items-center mb-6">
-    <button class="text-gray-600" routerLink="..">
-      <span class="material-icons">arrow_back</span>
+  <div class="flex justify-between items-center mb-6 bg-white p-4 rounded-lg shadow-sm">
+    <button class="text-gray-600 hover:text-gray-800 flex items-center" routerLink="..">
+      <span class="material-icons mr-1">arrow_back</span>
+      Back
     </button>
-    <h1 class="text-xl font-semibold">Add Schedule</h1>
-    <button class="bg-blue-500 text-white px-4 py-2 rounded-lg" (click)="saveExam()">
+    <h1 class="text-xl font-semibold">{{ isEditMode ? 'Edit' : 'Add' }} Exam Schedule</h1>
+    <button 
+      class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center disabled:opacity-50"
+      (click)="saveExam()"
+      [disabled]="isLoading || !isFormValid()">
+      <span class="material-icons mr-1">save</span>
       Save
     </button>
   </div>
 
   <!-- Form -->
-  <form #examForm="ngForm" (ngSubmit)="saveExam()" class="space-y-4">
+  <form #examForm="ngForm" (ngSubmit)="saveExam()" class="space-y-6">
+    <!-- Basic Info Section -->
+    <div class="bg-white p-6 rounded-lg shadow-sm">
+      <h2 class="text-lg font-medium mb-4 pb-2 border-b">Basic Information</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Exam Name -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Exam Name *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="exam.examName" 
+            name="examName"
+            required
+            class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+        </div>
 
-    <!-- Exam Name -->
-    <div class="space-y-2">
-      <label class="block text-black">Exam Name</label>
-      <input type="text" [(ngModel)]="exam.examName" name="examName"
-        class="w-full p-2 border rounded-lg bg-white text-black" />
-    </div>
-    <!-- Daily Study Hours -->
-    <div class="space-y-2">
-      <label class="block text-black">Daily Study Hours</label>
-      <input type="number" [(ngModel)]="exam.dailyStudyHours" name="dailyStudyHours"
-        class="w-full p-2 border rounded-lg bg-white text-black" />
-    </div>
+        <!-- Daily Study Hours -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Daily Study Hours *</label>
+          <input 
+            type="number" 
+            [(ngModel)]="exam.dailyStudyHours" 
+            name="dailyStudyHours"
+            required
+            min="1"
+            class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+        </div>
 
-    <!-- Exam Date -->
-    <div class="space-y-2">
-      <label class="block text-black">Exam Date</label>
-      <input type="date" [(ngModel)]="exam.examDate" name="examDate"
-        class="w-full p-2 border rounded-lg bg-white text-black" />
+        <!-- Exam Date -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Exam Date *</label>
+          <input 
+            type="date" 
+            [(ngModel)]="exam.examDate" 
+            name="examDate"
+            required
+            class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+      </div>
     </div>
 
     <!-- Subjects Section -->
-    <div class="space-y-2">
-      <div class="flex justify-between items-center">
-        <label class="block text-black">Subjects</label>
-        <button type="button" (click)="addSubject()" class="bg-gray-300 text-black px-3 py-1 rounded-lg text-sm">
+    <div class="bg-white p-6 rounded-lg shadow-sm">
+      <div class="flex justify-between items-center mb-4 pb-2 border-b">
+        <h2 class="text-lg font-medium">Subjects</h2>
+        <button 
+          type="button" 
+          (click)="addSubject()" 
+          class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm flex items-center">
+          <span class="material-icons mr-1">add</span>
           Add Subject
         </button>
       </div>
 
       <!-- Subjects List -->
-      <div class="space-y-4">
-        <div *ngFor="let subject of exam.subjects; let i = index"
-          class="space-y-2 p-3 border border-gray-300 rounded-lg">
-          <input type="text" [(ngModel)]="subject.name" [name]="'subject' + i" placeholder="Subject"
-            class="w-full p-2 border rounded-lg bg-white text-black" />
-
-          <!-- Subject Date -->
-          <div class="space-y-2">
-            <label class="block text-black">Subject Date</label>
-            <input type="date" [(ngModel)]="subject.date" [name]="'subjectDate' + i"
-              class="w-full p-2 border rounded-lg bg-white text-black" />
+      <div class="grid gap-4 md:grid-cols-2">
+        <div *ngFor="let subject of exam.subjects; let i = index" 
+          class="p-4 border border-gray-200 rounded-lg space-y-3 bg-gray-50">
+          <div class="flex justify-between items-start">
+            <h3 class="font-medium">Subject {{i + 1}}</h3>
+            <button 
+              type="button" 
+              (click)="removeSubject(i)"
+              class="text-red-500 hover:text-red-600">
+              <span class="material-icons">delete</span>
+            </button>
           </div>
 
-          <!-- Topics -->
-          <div>
-            <div *ngFor="let topic of subject.topics; let j = index" class="mt-2">
-              <input type="text" [(ngModel)]="subject.topics[j]" [name]="'topic' + i + j" placeholder="Topic"
-                class="w-full p-2 border rounded-lg bg-white text-black" />
+          <!-- Subject Details -->
+          <div class="space-y-4">
+            <!-- Subject Name -->
+            <input 
+              type="text" 
+              [(ngModel)]="subject.name" 
+              [name]="'subject' + i" 
+              placeholder="Subject Name"
+              required
+              class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white" />
+
+            <!-- Subject Date -->
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700">Subject Date *</label>
+              <input 
+                type="date" 
+                [(ngModel)]="subject.date" 
+                [name]="'subjectDate' + i"
+                required
+                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white" />
+            </div>
+
+            <!-- Topics -->
+            <div class="space-y-2">
+              <div class="flex justify-between items-center">
+                <label class="block text-sm font-medium text-gray-700">Topics</label>
+                <button 
+                  type="button" 
+                  (click)="addTopic(i)" 
+                  class="text-blue-500 hover:text-blue-600 text-sm flex items-center">
+                  <span class="material-icons mr-1">add_circle</span>
+                  Add
+                </button>
+              </div>
+              
+              <div class="space-y-2">
+                <div *ngFor="let topic of subject.topics; let j = index; trackBy: trackByIndex" 
+                  class="flex gap-2">
+                  <input 
+                    type="text" 
+                    [(ngModel)]="subject.topics[j]" 
+                    [name]="'topic' + i + j" 
+                    placeholder="Topic Name"
+                    class="flex-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white" />
+                  <button 
+                    type="button" 
+                    (click)="removeTopic(i, j)"
+                    class="text-red-500 hover:text-red-600">
+                    <span class="material-icons">remove_circle</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-
-          <button type="button" (click)="addTopic(i)" class="mt-2 bg-gray-300 text-black px-3 py-1 rounded-lg text-sm">
-            Add Topic
-          </button>
         </div>
       </div>
     </div>

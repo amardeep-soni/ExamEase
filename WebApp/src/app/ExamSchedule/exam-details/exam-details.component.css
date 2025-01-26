@@ -1,0 +1,19 @@
+.material-icons {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Timeline styling */
+.timeline-item:last-child {
+  border-left: none;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  background-color: #2563eb;
+  border-radius: 50%;
+  position: absolute;
+  left: -6px;
+  top: 0;
+}

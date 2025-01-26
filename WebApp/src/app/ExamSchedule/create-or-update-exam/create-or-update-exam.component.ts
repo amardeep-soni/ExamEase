@@ -1,14 +1,15 @@
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DateTime } from 'luxon';
+import { finalize } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   ExamScheduleRequest,
   ExamScheduleServiceProxy,
   ExamSubjectTimeDto,
 } from '../../../service-proxies/service-proxies';
-import { ServiceProxyModule } from '../../../service-proxies/service-proxy.module';
-import { DateTime } from 'luxon';
-import { ActivatedRoute, Router } from '@angular/router';
 
 interface Subject {
   name: string;
@@ -19,11 +20,12 @@ interface Subject {
 @Component({
   selector: 'app-create-or-update-exam',
   standalone: true,
-  imports: [CommonModule, FormsModule, ServiceProxyModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './create-or-update-exam.component.html',
   styleUrl: './create-or-update-exam.component.css',
+  providers: [ExamScheduleServiceProxy],
 })
-export class CreateOrUpdateExamComponent {
+export class CreateOrUpdateExamComponent implements OnInit {
   exam = {
     examName: '',
     examDate: '',
@@ -31,54 +33,82 @@ export class CreateOrUpdateExamComponent {
     dailyStudyHours: 0,
   };
 
+  isLoading = false;
+  isEditMode = false;
+  examId: number | null = null;
+
   constructor(
     private _examScheduleService: ExamScheduleServiceProxy,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar
   ) {}
 
-  // ngOnInit(): void {
-  //   this.activatedRoute.paramMap.subscribe((params) => {
-  //     const id = params.get('id');
-  //     if (id) {
-  //       this._examScheduleService.getExamSchedule(Number(id)).subscribe((exam) => {
-  //         console.log('Raw API response:', exam); // For debugging
-          
-  //         // this.exam = {
-  //         //   examName: exam.email || '', // Changed from examName to email
-  //         //   // examDate: exam.examDate
-  //         //   //   ? DateTime.fromISO(exam.examDate).toISODate()
-  //         //   //   : '',
-  //         //   dailyStudyHours: exam.dailyStudyHours || 0,
-  //         //   // subjects: exam.examSubjectTimes?.map((subject) => ({
-  //         //   //   name: subject.subject || '',
-  //         //   //   date: subject.examDateTime
-  //         //   //     ? DateTime.fromISO(subject.examDateTime).toISODate()
-  //         //   //     : '',
-  //         //   //   topics: subject.topicOrChapter || [],
-  //         //   // })) || [],
-  //         // };
-          
-  //         console.log('Mapped exam object:', this.exam); // For debugging
-  //       });
-  //     }
-  //   });
-  // }
+  ngOnInit(): void {
+    const id = this.activatedRoute.snapshot.paramMap.get('id');
+    if (id && !isNaN(Number(id))) {
+      this.examId = Number(id);
+      this.isEditMode = true;
+      this.loadExamDetails(this.examId);
+    }
+  }
+
+  loadExamDetails(id: number) {
+    this.isLoading = true;
+    this._examScheduleService.getExamSchedule(id)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (exam) => {
+          this.exam = {
+            examName: exam.examName || '',
+            examDate: exam.examDate ? DateTime.fromISO(exam.examDate.toString()).toISODate() ?? '' : '',
+            dailyStudyHours: exam.dailyStudyHours || 0,
+            subjects: exam.examSubjectTimes?.map((subject) => ({
+              name: subject.subject || '',
+              date: subject.examDateTime ? DateTime.fromISO(subject.examDateTime.toString()).toISODate() ?? '' : '',
+              topics: subject.topicOrChapter || [],
+            })) || [],
+          };
+        },
+        error: (error) => {
+          console.error('Error loading exam:', error);
+          this.snackBar.open('Failed to load exam details', 'Close', { duration: 3000 });
+        }
+      });
+  }
 
   addSubject() {
     this.exam.subjects.push({ name: '', topics: [''], date: '' });
+  }
+
+  removeSubject(index: number) {
+    this.exam.subjects.splice(index, 1);
   }
 
   addTopic(subjectIndex: number) {
     this.exam.subjects[subjectIndex].topics.push('');
   }
 
-  saveExam() {
+  removeTopic(subjectIndex: number, topicIndex: number) {
+    this.exam.subjects[subjectIndex].topics.splice(topicIndex, 1);
+  }
+
+  validateForm(): boolean {
     if (!this.exam.examName || !this.exam.examDate || this.exam.dailyStudyHours <= 0) {
-      console.error('Exam details are incomplete');
-      alert('Please fill in all required fields.');
-      return;
+      this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
+      return false;
     }
+
+    if (this.exam.subjects.length === 0) {
+      this.snackBar.open('Please add at least one subject', 'Close', { duration: 3000 });
+      return false;
+    }
+
+    return true;
+  }
+
+  saveExam() {
+    if (!this.validateForm()) return;
 
     const examSubjectTimes = this.exam.subjects
       .filter((subject) => subject.name && subject.date)
@@ -87,15 +117,8 @@ export class CreateOrUpdateExamComponent {
         dto.subject = subject.name;
         dto.topicOrChapter = subject.topics.filter((t) => t.trim() !== '');
         dto.examDateTime = DateTime.fromISO(subject.date);
-
         return dto;
       });
-
-    if (examSubjectTimes.length === 0) {
-      console.error('No valid subjects to save');
-      alert('Please add at least one valid subject.');
-      return;
-    }
 
     const request = new ExamScheduleRequest();
     request.dailyStudyHours = this.exam.dailyStudyHours;
@@ -103,17 +126,41 @@ export class CreateOrUpdateExamComponent {
     request.examSubjectTimes = examSubjectTimes;
     request.examName = this.exam.examName;
 
+    this.isLoading = true;
+    const operation = this.isEditMode
+      ? this._examScheduleService.updateExamSchedule(this.examId!, request)
+      : this._examScheduleService.createExamSchedule(request);
 
-    this._examScheduleService.createExamSchedule(request).subscribe(
-      (response) => {
-        alert('Exam saved successfully!');
-        this.router.navigate(['/exam']);
-        console.log('Exam saved:', response);
-      },
-      (error) => {
-        alert('Failed to save the exam.');
-        console.error('Error saving exam:', error);
-      }
+    operation
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: () => {
+          const message = this.isEditMode ? 'Exam updated successfully!' : 'Exam created successfully!';
+          this.snackBar.open(message, 'Close', { duration: 3000 });
+          this.router.navigate(['/exam']);
+        },
+        error: (error) => {
+          console.error('Error saving exam:', error);
+          this.snackBar.open('Failed to save exam', 'Close', { duration: 3000 });
+        }
+      });
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  isFormValid(): boolean {
+    return !!(
+      this.exam.examName &&
+      this.exam.examDate &&
+      this.exam.dailyStudyHours > 0 &&
+      this.exam.subjects.length > 0 &&
+      this.exam.subjects.every(subject => 
+        subject.name && 
+        subject.date && 
+        subject.topics.some(topic => topic.trim() !== '')
+      )
     );
   }
 }

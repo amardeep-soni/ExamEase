@@ -1,29 +1,75 @@
-<div class="p-4 bg-white text-gray-900 min-h-screen">
-  <div class="flex justify-between items-center mb-4">
-    <h1 class="text-3xl font-bold">Exam Management</h1>
-    <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600" (click)="addExam()">
-      <i class="fas fa-plus"></i> Add Exam
-    </button>
-  </div>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <div *ngFor="let exam of exams" class="bg-gray-100 p-4 rounded-lg shadow-md" (click)="viewPlan($event, exam)" >
-      <div class="flex justify-between items-center mb-2">
-        <h2 class="text-xl font-semibold">Test</h2>
-        <div class="flex space-x-2">
-          <button class="text-black hover:text-blue-600" (click)="viewExam(exam)">
-            <i class="fas fa-eye"></i> 
-          </button>
-          <button class="text-black hover:text-yellow-600" (click)="editExam(exam)">
-            <i class="fas fa-pencil-alt"></i>
-           
-          </button>
-          <button class="text-black hover:text-red-600" (click)="deleteExam(exam)">
-            <i class="fas fa-trash"></i>
-         
+<div class="p-4 max-w-7xl mx-auto">
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <div class="flex justify-between items-center mb-6 border-b pb-4">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">Exam Schedules</h1>
+        <p class="text-gray-600 mt-1">Manage your exam preparations</p>
+      </div>
+      <button 
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center shadow-sm" 
+        (click)="addExam()">
+        <span class="material-icons mr-2">add</span>
+        New Schedule
+      </button>
+    </div>
+
+    <!-- Grid Layout for Exam Cards -->
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div *ngFor="let exam of exams" 
+        class="bg-white border border-gray-200 rounded-lg p-5 hover:shadow-lg transition-shadow duration-200">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-800">{{exam.examName}}</h2>
+            <p class="text-sm text-gray-600 mt-1 flex items-center">
+              <span class="material-icons text-sm align-middle mr-1 text-blue-600">event</span>
+              {{exam.examDate.toJSDate() | date:'mediumDate'}}
+            </p>
+          </div>
+          <div class="flex space-x-2">
+            <button 
+              class="text-blue-600 hover:text-blue-800 p-1 rounded-full hover:bg-blue-50" 
+              (click)="viewExam(exam); $event.stopPropagation()">
+              <span class="material-icons">visibility</span>
+            </button>
+            <button 
+              class="text-blue-600 hover:text-blue-800 p-1 rounded-full hover:bg-blue-50" 
+              (click)="editExam(exam); $event.stopPropagation()">
+              <span class="material-icons">edit</span>
+            </button>
+            <button 
+              class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50" 
+              (click)="deleteExam(exam); $event.stopPropagation()">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-center text-sm text-gray-600">
+            <span class="material-icons mr-2 text-blue-600">schedule</span>
+            {{exam.dailyStudyHours}} hours daily
+          </div>
+          <button 
+            class="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg flex items-center justify-center transition-colors duration-200"
+            (click)="viewPlan($event, exam)">
+            <span class="material-icons mr-2">calendar_today</span>
+            View Study Plan
           </button>
         </div>
       </div>
-      <p class="text-gray-600">{{ exam.examDate.toJSDate() | date }}</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="exams.length === 0" class="text-center py-12">
+      <span class="material-icons text-6xl text-blue-200">event_busy</span>
+      <p class="mt-4 text-gray-600 text-lg">No exam schedules found</p>
+      <p class="text-gray-500 mb-6">Create your first exam schedule to get started</p>
+      <button 
+        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center mx-auto"
+        (click)="addExam()">
+        <span class="material-icons mr-2">add</span>
+        Create Schedule
+      </button>
     </div>
   </div>
 </div>
