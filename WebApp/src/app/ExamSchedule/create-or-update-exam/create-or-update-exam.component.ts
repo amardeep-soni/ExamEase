@@ -16,7 +16,7 @@ export class CreateOrUpdateExamComponent {
     subjects: [] as any[]
   };
 
-  constructor(private fb: FormBuilder) {
+  constructor() {
    
   }
 

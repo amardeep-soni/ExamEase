@@ -5,7 +5,10 @@
       <span class="material-icons">arrow_back</span>
     </button>
     <h1 class="text-xl font-semibold">Add Schedule</h1>
-    <button class="bg-blue-500 text-white px-4 py-2 rounded-lg" (click)="saveExam()">
+    <button
+      class="bg-blue-500 text-white px-4 py-2 rounded-lg"
+      (click)="saveExam()"
+    >
       Save
     </button>
   </div>
@@ -15,44 +18,73 @@
     <!-- Exam Name -->
     <div class="space-y-2">
       <label class="block text-gray-700">Exam Name</label>
-      <input type="text" [(ngModel)]="exam.examName" name="examName"
-        class="w-full p-2 border rounded-lg bg-gray-800 text-white">
+      <input
+        type="text"
+        [(ngModel)]="exam.examName"
+        name="examName"
+        class="w-full p-2 border rounded-lg bg-gray-800 text-white"
+      />
     </div>
 
     <!-- Exam Date -->
     <div class="space-y-2">
       <label class="block text-gray-700">Exam Date</label>
-      <input type="date" [(ngModel)]="exam.examDate" name="examDate"
-        class="w-full p-2 border rounded-lg bg-gray-800 text-white">
+      <input
+        type="date"
+        [(ngModel)]="exam.examDate"
+        name="examDate"
+        class="w-full p-2 border rounded-lg bg-gray-800 text-white"
+      />
     </div>
 
     <!-- Subjects Section -->
     <div class="space-y-2">
       <div class="flex justify-between items-center">
         <label class="block text-gray-700">Subjects</label>
-        <button type="button" (click)="addSubject()"
-          class="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm">
+        <button
+          type="button"
+          (click)="addSubject()"
+          class="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+        >
           Add Subject
         </button>
       </div>
 
       <!-- Subjects List -->
       <div class="space-y-4">
-        <div *ngFor="let subject of exam.subjects; let i=index"
-          class="space-y-2 p-3 border border-gray-700 rounded-lg">
-          <input type="text" [(ngModel)]="subject.name" [name]="'subject'+i" placeholder="Subject"
-            class="w-full p-2 border rounded-lg bg-gray-800 text-white">
-          
+        <div
+          *ngFor="let subject of exam.subjects; let i = index"
+          class="space-y-2 p-3 border border-gray-700 rounded-lg"
+        >
+          <input
+            type="text"
+            [(ngModel)]="subject.name"
+            [name]="'subject' + i"
+            placeholder="Subject"
+            class="w-full p-2 border rounded-lg bg-gray-800 text-white"
+          />
+
           <!-- Topics -->
           <div>
-            <div *ngFor="let topic of subject.topics; let j=index" class="mt-2">
-              <input type="text" [(ngModel)]="subject.topics[j]" [name]="'topic'+i+j" placeholder="Topic"
-                class="w-full p-2 border rounded-lg bg-gray-800 text-white">
+            <div
+              *ngFor="let topic of subject.topics; let j = index"
+              class="mt-2"
+            >
+              <input
+                type="text"
+                [(ngModel)]="subject.topics[j]"
+                [name]="'topic' + i + j"
+                placeholder="Topic"
+                class="w-full p-2 border rounded-lg bg-gray-800 text-white"
+              />
             </div>
           </div>
-          
-          <button type="button" (click)="addTopic(i)"
-            class="mt-2 bg-gray-700 text-white px-3 py-1 rounded-lg text-sm">
+
+          <button
+            type="button"
+            (click)="addTopic(i)"
+            class="mt-2 bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+          >
             Add Topic
           </button>
         </div>
