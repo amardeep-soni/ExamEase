@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ExamScheduleResponse, ExamScheduleServiceProxy } from '../../../service-proxies/service-proxies';
 import { ServiceProxyModule } from '../../../service-proxies/service-proxy.module';
 import { CustomDeleteDialogComponent } from '../../dialogs/custom-delete-dialog/custom-delete-dialog.component';
+import { finalize } from 'rxjs/operators';
 
 interface Exam {
   name: string;
@@ -19,6 +20,7 @@ interface Exam {
 })
 export class ExamListComponent {
   exams: ExamScheduleResponse[] = [];
+  isLoading = false;
 
   constructor(
     private router: Router,
@@ -27,13 +29,23 @@ export class ExamListComponent {
   ) { }
 
   ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
-    this._examScheduleService.getExamSchedules().subscribe((exams) => {
-      console.log(exams);
-      this.exams = exams;
-    });
+    this.loadExams();
   }
+
+  loadExams(): void {
+    this.isLoading = true;
+    this._examScheduleService.getExamSchedules()
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (exams) => {
+          this.exams = exams;
+        },
+        error: (error) => {
+          console.error('Error loading exams:', error);
+        }
+      });
+  }
+
   addExam() {
     this.router.navigate(['/create-exam']);
   }
@@ -54,8 +66,6 @@ export class ExamListComponent {
     console.log(exam.id); 
   }
 
-
-
   deleteExam(exam: any) {
     const dialogRef = this.dialog.open(CustomDeleteDialogComponent, {
       width: '400px',
@@ -69,7 +79,7 @@ export class ExamListComponent {
           () => {
             console.log('Exam deleted successfully');
             // Refresh the exam list
-            this.ngOnInit();
+            this.loadExams();
           },
           error => {
             console.error('Error deleting exam:', error);

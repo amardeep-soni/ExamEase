@@ -7,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { TaskPreviewDialogComponent } from './task-preview-dialog/task-preview-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DatePipe } from '@angular/common';
+import { finalize } from 'rxjs/operators';
 
 interface Task {
   subject: string;
@@ -34,6 +35,7 @@ export class StudyPlanComponent {
   tasks: Task[] = [];
   hoveredDate: Date | null = null;
   weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  isLoading = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -57,30 +59,33 @@ export class StudyPlanComponent {
   }
 
   loadTasks() {
-    this.studyPlanService.getAllStudyPlansByExamScheduleId(this.examId).subscribe({
-      next: (result) => {
-        this.tasksData = result;
-        console.log('Tasks loaded:', result);
-        if (result.plans) {
-          // Transform API data to match our Task interface
-          this.tasks = result.plans.flatMap(plan => {
-            if (plan.date && plan.tasks) {
-              return plan.tasks.map(task => ({
-                subject: task.subject || '',
-                date: this.formatDate(new Date(plan.date || new Date())),
-                time: `${task.timeAllocated} min`,
-                topic: task.topic || ''
-              }));
-            }
-            return [];
-          });
-          this.updateDisplayedTasks();
+    this.isLoading = true;
+    this.studyPlanService.getAllStudyPlansByExamScheduleId(this.examId)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (result) => {
+          this.tasksData = result;
+          console.log('Tasks loaded:', result);
+          if (result.plans) {
+            // Transform API data to match our Task interface
+            this.tasks = result.plans.flatMap(plan => {
+              if (plan.date && plan.tasks) {
+                return plan.tasks.map(task => ({
+                  subject: task.subject || '',
+                  date: this.formatDate(new Date(plan.date || new Date())),
+                  time: `${task.timeAllocated} min`,
+                  topic: task.topic || ''
+                }));
+              }
+              return [];
+            });
+            this.updateDisplayedTasks();
+          }
+        },
+        error: (error) => {
+          console.error('Error loading tasks:', error);
         }
-      },
-      error: (error) => {
-        console.error('Error loading tasks:', error);
-      }
-    });
+      });
   }
 
   updateDisplayedTasks() {
