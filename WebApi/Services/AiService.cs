@@ -8,6 +8,15 @@ using System.IO;
 using NetTopologySuite.Utilities;
 using Microsoft.Identity.Client;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Microsoft.SemanticKernel.Agents;
+using Microsoft.Extensions.Options;
+using static UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor.ContentOrderTextExtractor;
+using WebApi.Model;
+using Azure;
+using OllamaSharp;
+using DocumentFormat.OpenXml.Office.SpreadSheetML.Y2023.MsForms;
 
 namespace WebApi.Services
 {
@@ -17,17 +26,20 @@ namespace WebApi.Services
         private readonly IKernelMemory _memory;
         private readonly IChatCompletionService _chatCompletionService;
         private readonly IUserContextService _userContextService;
+        private readonly IOptions<GoogleAIOptions> _options;
 
         public AIService(
             Kernel kernel,
             IKernelMemory memory,
             IChatCompletionService chatCompletionService,
-            IUserContextService userContextService)
+            IUserContextService userContextService,
+            IOptions<GoogleAIOptions> options)
         {
             _kernel = kernel;
             _memory = memory;
             _chatCompletionService = chatCompletionService;
             _userContextService = userContextService;
+            _options = options;
         }
 
         public async Task<string> GetAiAnswer(string question)
@@ -52,25 +64,45 @@ namespace WebApi.Services
             await _memory.DeleteDocumentAsync(documentId, index: "default");
         }
 
+        public async Task<ResponseMessage> AskAnswerTest(string question)
+        {
+            ChatHistory chat = new ChatHistory();
+            chat.AddUserMessage(question);
+
+            var kernel = Kernel.CreateBuilder()
+                .AddGoogleAIGeminiChatCompletion(_options.Value.ChatModelId, _options.Value.ApiKey)
+                .Build();
+
+            ChatCompletionAgent agent = new()
+            {
+                Name = "Answer Agent",
+                Instructions = "Give answer in Japanese",
+                Kernel = kernel,
+            };
+
+            var aiAnswer = "";
+
+            try
+            {
+                await foreach (var aiResponse in agent.InvokeAsync(chat))
+                {
+                    aiAnswer = aiResponse.Content?.Trim() ?? "";
+                }
+            }
+            catch (HttpOperationException ex)
+            {
+                return new ResponseMessage { IsError = "true", Message = $"Error: {ex.Message}" };
+            }
+
+            return new ResponseMessage { IsError = "false", Message = aiAnswer };
+        }
+            
+
         public async Task<List<StudyPlanRequest>> GenerateStudyPlanTask(ExamScheduleRequest examScheduleRequest)
         {
-            var chatHistory = new ChatHistory();
-            chatHistory.AddSystemMessage(@"You are an AI assistant that helps generate study plans based on the provided exam schedule. 
-                Your response should be a plain JSON array without any markdown formatting, escape characters, or newlines, following this structure:
-                [{""date"": ""yyyy-MM-dd"", ""tasks"": [{""subject"": ""[subject name]"",""topic"": ""[topic name]"",""timeAllocated"": [time in minutes]}]}]");
-            chatHistory.AddSystemMessage(@"Use the provided exam schedule to create a daily study plan until each exam date.
-                Allocate study time based on the daily study hours and the time remaining until each exam.
-                Consider the following when generating the plan:
-                - Create a day-by-day schedule starting from the provided Today date until each exam date
-                - Only include study tasks for subjects whose exams haven't happened yet
-                - After an exam is completed, remove that subject from future study days
-                - Prioritize subjects with earlier exam dates
-                - Break down topics into manageable chunks
-                - Account for the daily study hours constraint
-                - Total time allocated per day should not exceed daily study hours");
-
+            ChatHistory chat = [];
             // Create detailed user message with exam schedule
-            chatHistory.AddUserMessage(
+            chat.AddUserMessage(
                 $"Please generate a daily study plan based on the following schedule:\n\n" +
                 $"Available Study Hours Per Day: {examScheduleRequest.DailyStudyHours}\n" +
                 $"Today Date: {DateTime.Now:yyyy-MM-dd}\n" +
@@ -82,16 +114,41 @@ namespace WebApi.Services
                 ))
             );
 
-            // Get AI response
-            var response = await _chatCompletionService.GetChatMessageContentAsync(
-                chatHistory: chatHistory,
-                kernel: _kernel
-            );
+            var kernel = Kernel.CreateBuilder()
+            .AddGoogleAIGeminiChatCompletion(_options.Value.ChatModelId, _options.Value.ApiKey)
+            .Build();
 
+            ChatCompletionAgent agent =
+                new()
+                {
+                    Name = "Answer Agent",
+                    Instructions = @"You are an AI assistant that helps generate study plans based on the provided exam schedule. 
+                                Your response should be a plain JSON array without any markdown formatting, escape characters, or newlines, following this structure:
+                                [{""date"": ""yyyy-MM-dd"", ""tasks"": [{""subject"": ""[subject name]"",""topic"": ""[topic name]"",""timeAllocated"": [time in minutes]}]}]
+                                \n Use the provided exam schedule to create a daily study plan until each exam date.
+                                Allocate study time based on the daily study hours and the time remaining until each exam.
+                                Consider the following when generating the plan:
+                                - Create a day-by-day schedule starting from the provided Today date until each exam date
+                                - Only include study tasks for subjects whose exams haven't happened yet
+                                - After an exam is completed, remove that subject from future study days
+                                - Prioritize subjects with earlier exam dates
+                                - Break down topics into manageable chunks
+                                - Account for the daily study hours constraint
+                                - Total time allocated per day should not exceed daily study hours",
+                    Kernel = kernel,
+                };
+
+            var aiAnswer = "";
+
+            await foreach (var aiResponse in agent.InvokeAsync(chat))
+            {
+                aiAnswer = aiResponse.Content?.Trim() ?? "";
+            }
+                   
             try
             {
                 // Clean up the response content
-                var content = response.Content
+                var content = aiAnswer
                     .Replace("```json", "")
                     .Replace("```", "")
                     .Replace("\n", "")
@@ -228,17 +285,30 @@ namespace WebApi.Services
                     var allTexts = searchResult.Results.SelectMany(r => r.Partitions).Select(p => p.Text).ToList();
                     var combinedText = string.Join(" ", allTexts);
 
-                    var chatHistory = new ChatHistory();
-                    chatHistory.AddSystemMessage("You are an AI assistant that helps find the most relevant answer from the provided text. Don't add Extra Text");
-                    chatHistory.AddUserMessage($"Question: {question}\n\nText: {combinedText}");
+                    ChatHistory chat = [];
+                    chat.AddUserMessage($"Question: {question}\n\nDocumentTexts: {combinedText}");
 
-                    var response = await _chatCompletionService.GetChatMessageContentAsync(
-                        chatHistory: chatHistory,
-                        kernel: _kernel
-                    );
+                    var kernel = Kernel.CreateBuilder()
+                    .AddGoogleAIGeminiChatCompletion(_options.Value.ChatModelId, _options.Value.ApiKey)
+                    .Build();
+
+                    ChatCompletionAgent agent =
+                    new()
+                    {
+                        Name = "Answer Agent",
+                        Instructions = "find the most relevant answer from the provided text. Don't add Extra Text",
+                        Kernel = kernel,
+                    };
+
+                    var aiAnswer = "";
+
+                    await foreach (var aiResponse in agent.InvokeAsync(chat))
+                    {
+                        aiAnswer = aiResponse.Content?.Trim() ?? "";
+                    }
 
                     res.IsError = "false";
-                    res.Message = response.Content;
+                    res.Message = aiAnswer;
                 }
                 else
                 {

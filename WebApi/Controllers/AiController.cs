@@ -91,6 +91,13 @@ namespace WebApi.Controllers
             var result = await _aiService.AskQuestionAsync(question, subject);
             return result;
         }
+        
+        [HttpGet("AskAnswerTest")]
+        public async Task<ResponseMessage> AskAnswerTest(string question)
+        {
+            var result = await _aiService.AskAnswerTest(question);
+            return result;
+        }
 
         [HttpDelete("DeleteDocumentAsync")]
         public async Task<ResponseMessage> DeleteDocumentAsync(List<string> documentIds)
@@ -107,6 +114,7 @@ namespace WebApi.Controllers
             await _aiService.DeleteDocumentsAsync(documentIds);
             return new ResponseMessage { IsError = "false", Message = "Documents deleted successfully." };
         }
+
     }
 
     public class AddDataRequest

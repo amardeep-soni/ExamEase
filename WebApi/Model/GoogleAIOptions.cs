@@ -2,7 +2,7 @@
 
 namespace WebApi.Model
 {
-    public class OpenAIOptions
+    public class GoogleAIOptions
     {
         public string ApiKey { get; set; }
         public string ChatModelId { get; set; }

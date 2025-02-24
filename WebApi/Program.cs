@@ -14,24 +14,28 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using WebApi.IRepositories;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.SemanticKernel.Connectors.Google;
+using Microsoft.KernelMemory.AI.Ollama;
+using Microsoft.KernelMemory.AI;
+using Microsoft.KernelMemory.SemanticKernel;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 // Retrieve the OpenAI API settings from configuration
-var openAIConfig = builder.Configuration.GetSection("OpenAi");
+var openAIConfig = builder.Configuration.GetSection("GoogleAI");
 
 // Add this near the top of your service configuration
-builder.Services.Configure<OpenAIOptions>(
-    builder.Configuration.GetSection("OpenAi"));
+builder.Services.Configure<GoogleAIOptions>(
+    builder.Configuration.GetSection("GoogleAI"));
 
 // Register Semantic Kernel
 builder.Services.AddTransient<Kernel>(serviceProvider =>
 {
-    var options = serviceProvider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+    var options = serviceProvider.GetRequiredService<IOptions<GoogleAIOptions>>().Value;
     var kernel = Kernel.CreateBuilder()
-        .AddOpenAIChatCompletion(options.ChatModelId, options.ApiKey)
+        .AddGoogleAIGeminiChatCompletion(options.ChatModelId, options.ApiKey)
         .Build();
 
     return kernel;
@@ -40,29 +44,32 @@ builder.Services.AddTransient<Kernel>(serviceProvider =>
 // Chat completion service that kernels will use
 builder.Services.AddSingleton<IChatCompletionService>(sp =>
 {
-    OpenAIOptions options = sp.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+    GoogleAIOptions options = sp.GetRequiredService<IOptions<GoogleAIOptions>>().Value;
 
-    return new OpenAIChatCompletionService(options.ChatModelId, options.ApiKey);
+    return new GoogleAIGeminiChatCompletionService(options.ChatModelId, options.ApiKey);
 
 });
 builder.Services.AddSingleton<IKernelMemory>(sp =>
 {
-    var options = sp.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+    var options = sp.GetRequiredService<IOptions<GoogleAIOptions>>().Value;
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
     IKernelMemoryBuilder kmBuilder = new KernelMemoryBuilder();
 
+    var embeddingGenerator = new SemanticKernelTextEmbeddingGenerator( new GoogleAITextEmbeddingGenerationService(
+        options.EmbeddingModelId,
+        options.ApiKey,
+        GoogleAIVersion.V1_Beta,
+        null,
+        null
+    ), new SemanticKernelConfig { MaxTokenTotal = 8191});
+    var googleTextGenerator = new GoogleAITextGenerationService(
+        options.ChatModelId, // Use Google's text generation model
+        options.ApiKey
+    );
     var memory = kmBuilder
-        .WithOpenAITextEmbeddingGeneration(new OpenAIConfig 
-        { 
-            EmbeddingModel = options.EmbeddingModelId, 
-            APIKey = options.ApiKey 
-        })
-        .WithOpenAITextGeneration(new OpenAIConfig 
-        { 
-            TextModel = options.ChatModelId, 
-            APIKey = options.ApiKey 
-        })
+        .WithCustomEmbeddingGenerator(embeddingGenerator)
+         .WithCustomTextGenerator(new SemanticKernelTextGenerator(googleTextGenerator, new SemanticKernelConfig { MaxTokenTotal = 8191 })) // Use Google AI
         .WithSqlServerMemoryDb(new SqlServerConfig
         {
             ConnectionString = connectionString,
