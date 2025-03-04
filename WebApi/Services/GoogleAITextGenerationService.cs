@@ -36,7 +36,6 @@ public class GoogleAITextGenerationService : ITextGenerationService
 
         try
         {
-            // Build the request body as per the Google docs example.
             var requestBody = new
             {
                 contents = new[]
@@ -48,13 +47,17 @@ public class GoogleAITextGenerationService : ITextGenerationService
                             new { text = prompt }
                         }
                     }
+                },
+                generationConfig = new
+                {
+                    temperature =   0.7,
+                    maxOutputTokens = 1024
                 }
             };
 
             string json = JsonSerializer.Serialize(requestBody);
             var requestContent = new StringContent(json, Encoding.UTF8, "application/json");
 
-            // Use the v1beta endpoint with generateContent.
             string url = $"https://generativelanguage.googleapis.com/v1beta/models/{_modelId}:generateContent?key={_apiKey}";
             var response = await _httpClient.PostAsync(url, requestContent, cancellationToken);
             string responseContent = await response.Content.ReadAsStringAsync();
@@ -71,24 +74,19 @@ public class GoogleAITextGenerationService : ITextGenerationService
                 candidates.ValueKind == JsonValueKind.Array &&
                 candidates.GetArrayLength() > 0)
             {
-                // Get the first candidate.
                 var candidate = candidates[0];
 
-                // Option 1: Candidate has a "content" property that may wrap the parts.
                 if (candidate.TryGetProperty("content", out JsonElement contentElement))
                 {
-                    // If "content" is a string, use it directly.
                     if (contentElement.ValueKind == JsonValueKind.String)
                     {
                         generatedText = contentElement.GetString() ?? string.Empty;
                     }
-                    // Otherwise, check if "content" has a "parts" array.
                     else if (contentElement.ValueKind == JsonValueKind.Object && contentElement.TryGetProperty("parts", out JsonElement parts))
                     {
                         generatedText = GetTextFromParts(parts);
                     }
                 }
-                // Option 2: Candidate directly contains a "parts" array.
                 else if (candidate.TryGetProperty("parts", out JsonElement parts))
                 {
                     generatedText = GetTextFromParts(parts);
@@ -103,29 +101,125 @@ public class GoogleAITextGenerationService : ITextGenerationService
         }
     }
 
-    private string GetTextFromParts(JsonElement parts)
-    {
-        if (parts.ValueKind == JsonValueKind.Array && parts.GetArrayLength() > 0)
-        {
-            var firstPart = parts[0];
-            if (firstPart.TryGetProperty("text", out JsonElement textElement))
-            {
-                return textElement.GetString() ?? string.Empty;
-            }
-        }
-        return string.Empty;
-    }
-
     public async IAsyncEnumerable<StreamingTextContent> GetStreamingTextContentsAsync(
         string prompt,
         PromptExecutionSettings? settings = null,
         Kernel? kernel = null,
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var results = await GetTextContentsAsync(prompt, settings, kernel, cancellationToken);
-        foreach (var result in results)
+        if (string.IsNullOrWhiteSpace(prompt))
         {
-            yield return new StreamingTextContent(result.Text);
+            throw new ArgumentException("Prompt cannot be null or whitespace.", nameof(prompt));
         }
+
+        Console.WriteLine($"Starting streaming request for prompt: {prompt.Substring(0, Math.Min(50, prompt.Length))}...");
+
+        var requestBody = new
+        {
+            contents = new[]
+            {
+                new
+                {
+                    parts = new[]
+                    {
+                        new { text = prompt }
+                    }
+                }
+            },
+            generationConfig = new
+            {
+                temperature = 0.7,
+                maxOutputTokens = 1024
+            }
+        };
+
+        string json = JsonSerializer.Serialize(requestBody);
+        var requestContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+        string url = $"https://generativelanguage.googleapis.com/v1beta/models/{_modelId}:streamGenerateContent?key={_apiKey}";
+        var request = new HttpRequestMessage(HttpMethod.Post, url);
+        request.Content = requestContent;
+
+        Console.WriteLine("Sending streaming request to Google AI API...");
+
+        using var response = await _httpClient.SendAsync(
+            request,
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
+
+        Console.WriteLine($"Response status: {response.StatusCode}");
+        response.EnsureSuccessStatusCode();
+
+        using var stream = await response.Content.ReadAsStreamAsync();
+        using var reader = new StreamReader(stream);
+
+        int chunkCount = 0;
+        StringBuilder fullResponse = new StringBuilder();
+
+        string? line;
+        while ((line = await reader.ReadLineAsync()) != null && !cancellationToken.IsCancellationRequested)
+        {
+            if (string.IsNullOrEmpty(line)) continue;
+
+            if (line.StartsWith("data: "))
+            {
+                string jsonData = line.Substring(6).Trim();
+
+                // Skip end-of-stream marker
+                if (jsonData == "[DONE]")
+                {
+                    Console.WriteLine("Received [DONE] marker. Streaming complete.");
+                    break;
+                }
+
+                var jsonResponse = JsonDocument.Parse(jsonData);
+                var root = jsonResponse.RootElement;
+
+                if (root.TryGetProperty("candidates", out JsonElement candidates) &&
+                    candidates.ValueKind == JsonValueKind.Array &&
+                    candidates.GetArrayLength() > 0)
+                {
+                    var candidate = candidates[0];
+
+                    if (candidate.TryGetProperty("content", out JsonElement content) &&
+                        content.TryGetProperty("parts", out JsonElement parts) &&
+                        parts.ValueKind == JsonValueKind.Array &&
+                        parts.GetArrayLength() > 0)
+                    {
+                        var part = parts[0];
+                        if (part.TryGetProperty("text", out JsonElement textElement))
+                        {
+                            string text = textElement.GetString() ?? string.Empty;
+                            if (!string.IsNullOrEmpty(text))
+                            {
+                                chunkCount++;
+                                fullResponse.Append(text);
+                                Console.WriteLine($"Chunk #{chunkCount}: {text}");
+                                yield return new StreamingTextContent(text);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Console.WriteLine($"Streaming complete. Received {chunkCount} chunks.");
+        Console.WriteLine($"Full response length: {fullResponse.Length} characters");
+    }
+
+    private string GetTextFromParts(JsonElement parts)
+    {
+        if (parts.ValueKind != JsonValueKind.Array)
+            return string.Empty;
+
+        var sb = new StringBuilder();
+        foreach (var part in parts.EnumerateArray())
+        {
+            if (part.TryGetProperty("text", out JsonElement textElement))
+            {
+                sb.Append(textElement.GetString());
+            }
+        }
+        return sb.ToString();
     }
 }
