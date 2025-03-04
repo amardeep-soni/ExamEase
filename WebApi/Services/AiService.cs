@@ -17,6 +17,8 @@ using WebApi.Model;
 using Azure;
 using OllamaSharp;
 using DocumentFormat.OpenXml.Office.SpreadSheetML.Y2023.MsForms;
+using Microsoft.AspNetCore.SignalR;
+using WebApi.Hubs;
 
 namespace WebApi.Services
 {
@@ -27,19 +29,22 @@ namespace WebApi.Services
         private readonly IChatCompletionService _chatCompletionService;
         private readonly IUserContextService _userContextService;
         private readonly IOptions<GoogleAIOptions> _options;
+        private readonly IHubContext<ChatHub> _hubContext;
 
         public AIService(
             Kernel kernel,
             IKernelMemory memory,
             IChatCompletionService chatCompletionService,
             IUserContextService userContextService,
-            IOptions<GoogleAIOptions> options)
+            IOptions<GoogleAIOptions> options,
+            IHubContext<ChatHub> hubContext)
         {
             _kernel = kernel;
             _memory = memory;
             _chatCompletionService = chatCompletionService;
             _userContextService = userContextService;
             _options = options;
+            _hubContext = hubContext;
         }
 
         public async Task<string> GetAiAnswer(string question)
@@ -257,64 +262,84 @@ namespace WebApi.Services
         //    return "No relevant answer found.";
         //}
 
-        public async Task<ResponseMessage> AskQuestionAsync(string question, string subject)
+        public async Task<ResponseMessage> AskQuestionAsync(string question, string subject, string connectionId)
         {
             var res = new ResponseMessage();
-            var userEmail = _userContextService.GetUserEmail();
-            var memoryAnswer = await _memory.AskAsync(
-                question,
-                filter: new MemoryFilter().ByTag("email", userEmail).ByTag("subject", subject),
-                minRelevance: 0.4
-            );
-
-            if (memoryAnswer.NoResult == false)
+            try 
             {
-                res.IsError = "false";
-                res.Message = memoryAnswer.Result;
-            }
-            else
-            {
-                var searchResult = await _memory.SearchAsync(
+                var userEmail = _userContextService.GetUserEmail();
+                var memoryAnswer = await _memory.AskAsync(
                     question,
-                    minRelevance: 0.2,
-                    filter: new MemoryFilter().ByTag("email", userEmail)
+                    filter: new MemoryFilter().ByTag("email", userEmail).ByTag("subject", subject),
+                    minRelevance: 0.4
                 );
 
-                if (searchResult.NoResult == false)
+                if (!memoryAnswer.NoResult)
                 {
-                    var allTexts = searchResult.Results.SelectMany(r => r.Partitions).Select(p => p.Text).ToList();
-                    var combinedText = string.Join(" ", allTexts);
-
-                    ChatHistory chat = [];
-                    chat.AddUserMessage($"Question: {question}\n\nDocumentTexts: {combinedText}");
-
-                    var kernel = Kernel.CreateBuilder()
-                    .AddGoogleAIGeminiChatCompletion(_options.Value.ChatModelId, _options.Value.ApiKey)
-                    .Build();
-
-                    ChatCompletionAgent agent =
-                    new()
-                    {
-                        Name = "Answer Agent",
-                        Instructions = "find the most relevant answer from the provided text. Don't add Extra Text",
-                        Kernel = kernel,
-                    };
-
-                    var aiAnswer = "";
-
-                    await foreach (var aiResponse in agent.InvokeAsync(chat))
-                    {
-                        aiAnswer = aiResponse.Content?.Trim() ?? "";
-                    }
-
                     res.IsError = "false";
-                    res.Message = aiAnswer;
+                    res.Message = memoryAnswer.Result;
+                    await _hubContext.Clients.Group(connectionId).SendAsync("ReceiveStreamMessage", memoryAnswer.Result);
                 }
                 else
                 {
-                    res.IsError = "true";
-                    res.Message = "No relevant answer found.";
+                    var searchResult = await _memory.SearchAsync(
+                        question,
+                        minRelevance: 0.2,
+                        filter: new MemoryFilter().ByTag("email", userEmail)
+                    );
+
+                    if (!searchResult.NoResult)
+                    {
+                        var allTexts = searchResult.Results.SelectMany(r => r.Partitions).Select(p => p.Text).ToList();
+                        var combinedText = string.Join(" ", allTexts);
+
+                        ChatHistory chat = [];
+                        chat.AddUserMessage($"Question: {question}\n\nDocumentTexts: {combinedText}");
+
+                        var kernel = Kernel.CreateBuilder()
+                            .AddGoogleAIGeminiChatCompletion(_options.Value.ChatModelId, _options.Value.ApiKey)
+                            .Build();
+
+                        ChatCompletionAgent agent = new()
+                        {
+                            Name = "Answer Agent",
+                            Instructions = "find the most relevant answer from the provided text. Don't add Extra Text",
+                            Kernel = kernel,
+                        };
+
+                        var aiAnswer = "";
+                        await _hubContext.Groups.AddToGroupAsync(connectionId, connectionId);
+
+                        try
+                        {
+                            await foreach (var aiResponse in agent.InvokeStreamingAsync(chat))
+                            {
+                                var chunk = aiResponse.Content?.Trim() ?? "";
+                                await _hubContext.Clients.Group(connectionId).SendAsync("ReceiveStreamMessage", chunk);
+                                aiAnswer += chunk;
+                            }
+                        }
+                        finally
+                        {
+                            await _hubContext.Groups.RemoveFromGroupAsync(connectionId, connectionId);
+                        }
+
+                        res.IsError = "false";
+                        res.Message = aiAnswer;
+                    }
+                    else
+                    {
+                        res.IsError = "true";
+                        res.Message = "No relevant answer found.";
+                        await _hubContext.Clients.Group(connectionId).SendAsync("ReceiveStreamMessage", "No relevant answer found.");
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                res.IsError = "true";
+                res.Message = "An error occurred while processing your request.";
+                await _hubContext.Clients.Group(connectionId).SendAsync("ReceiveStreamMessage", "An error occurred while processing your request.");
             }
 
             return res;

@@ -18,6 +18,8 @@ using Microsoft.SemanticKernel.Connectors.Google;
 using Microsoft.KernelMemory.AI.Ollama;
 using Microsoft.KernelMemory.AI;
 using Microsoft.KernelMemory.SemanticKernel;
+using Microsoft.AspNetCore.SignalR;
+using WebApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -156,6 +158,9 @@ builder.Services.AddCors(options =>
         });
 });
 
+// Add SignalR services
+builder.Services.AddSignalR();
+
 if (builder.Environment.IsProduction())
 {
     builder.Configuration.AddJsonFile("appsettings.Production.json", optional: false, reloadOnChange: true);
@@ -179,5 +184,8 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Add SignalR endpoint
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();

@@ -319,9 +319,10 @@ export class AiServiceProxy {
     /**
      * @param question (optional) 
      * @param subject (optional) 
+     * @param connectionId (optional) 
      * @return OK
      */
-    askQuestion(question: string | undefined, subject: string | undefined): Observable<ResponseMessage> {
+    askQuestion(question: string | undefined, subject: string | undefined, connectionId: string | undefined): Observable<ResponseMessage> {
         let url_ = this.baseUrl + "/api/Ai/AskQuestion?";
         if (question === null)
             throw new Error("The parameter 'question' cannot be null.");
@@ -331,6 +332,10 @@ export class AiServiceProxy {
             throw new Error("The parameter 'subject' cannot be null.");
         else if (subject !== undefined)
             url_ += "subject=" + encodeURIComponent("" + subject) + "&";
+        if (connectionId === null)
+            throw new Error("The parameter 'connectionId' cannot be null.");
+        else if (connectionId !== undefined)
+            url_ += "connectionId=" + encodeURIComponent("" + connectionId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -356,6 +361,62 @@ export class AiServiceProxy {
     }
 
     protected processAskQuestion(response: HttpResponseBase): Observable<ResponseMessage> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResponseMessage.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param question (optional) 
+     * @return OK
+     */
+    askAnswerTest(question: string | undefined): Observable<ResponseMessage> {
+        let url_ = this.baseUrl + "/api/Ai/AskAnswerTest?";
+        if (question === null)
+            throw new Error("The parameter 'question' cannot be null.");
+        else if (question !== undefined)
+            url_ += "question=" + encodeURIComponent("" + question) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAskAnswerTest(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAskAnswerTest(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResponseMessage>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResponseMessage>;
+        }));
+    }
+
+    protected processAskAnswerTest(response: HttpResponseBase): Observable<ResponseMessage> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :

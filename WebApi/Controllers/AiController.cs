@@ -86,9 +86,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("AskQuestion")]
-        public async Task<ResponseMessage> AskQuestion(string question, string subject)
+        public async Task<ResponseMessage> AskQuestion(string question, string subject, string connectionId)
         {
-            var result = await _aiService.AskQuestionAsync(question, subject);
+            var result = await _aiService.AskQuestionAsync(question, subject, connectionId);
             return result;
         }
         
