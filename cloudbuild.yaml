@@ -29,8 +29,8 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
-      - '--set-env-vars'
-      - 'ASPNETCORE_ENVIRONMENT=Production'
+
+
 
 
   # 6. Deploy Frontend to Cloud Run
