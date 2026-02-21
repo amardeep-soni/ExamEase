@@ -151,12 +151,17 @@ builder.Services.AddCors(options =>
         builder =>
         {
             builder
-                .SetIsOriginAllowed(_ => true) // Allow any origin
+                .WithOrigins(
+                    "http://localhost:4200",
+                    "https://examease.mithilacoders.com",
+                    "https://mithilacoders.com"
+                )
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials();
         });
 });
+
 
 
 // Add SignalR services
