@@ -151,12 +151,13 @@ builder.Services.AddCors(options =>
         builder =>
         {
             builder
-                .WithOrigins("http://localhost:4200", "https://examease.amardeepdev.com")
+                .SetIsOriginAllowed(_ => true) // Allow any origin
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials();
         });
 });
+
 
 // Add SignalR services
 builder.Services.AddSignalR();
