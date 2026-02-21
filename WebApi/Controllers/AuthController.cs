@@ -17,7 +17,7 @@ namespace WebApi.Controllers
         [HttpGet("status")]
         public string GetStatus()
         {
-            return "ExamEase API is Live and Running! Deployment successful.";
+            return "ExamEase API is Live and Running! Deployment successful. Test2";
         }
 
 
