@@ -14,6 +14,13 @@ namespace WebApi.Controllers
             _userService = userService;
         }
 
+        [HttpGet("status")]
+        public string GetStatus()
+        {
+            return "ExamEase API is Live and Running! Deployment successful.";
+        }
+
+
         [HttpPost("register")]
         public async Task<ResponseMessage> Register([FromBody] RegisterDto registerDto)
         {
