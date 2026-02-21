@@ -163,29 +163,55 @@ builder.Services.AddSignalR();
 
 if (builder.Environment.IsProduction())
 {
-    builder.Configuration.AddJsonFile("appsettings.Production.json", optional: false, reloadOnChange: true);
+    builder.Configuration.AddJsonFile("appsettings.Production.json", optional: true, reloadOnChange: true);
 }
 
-var app = builder.Build();
 
-app.UseStaticFiles(new StaticFileOptions
+try
 {
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "wwwroot")),
-    RequestPath = "/static"
-});
+    var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(
+            Path.Combine(builder.Environment.ContentRootPath, "wwwroot")),
+        RequestPath = "/static"
+    });
 
-app.UseHttpsRedirection();
-app.UseCors("CorsPolicy");
-app.UseStaticFiles();
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 
-// Add SignalR endpoint
-app.MapHub<ChatHub>("/chatHub");
+    app.UseHttpsRedirection();
+    app.UseCors("CorsPolicy");
+    app.UseStaticFiles();
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.MapControllers();
 
-app.Run();
+    // Add SignalR endpoint
+    app.MapHub<ChatHub>("/chatHub");
+    // Automatically apply migrations on startup
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            var context = services.GetRequiredService<ApplicationDbContext>();
+            if (context.Database.GetPendingMigrations().Any())
+            {
+                context.Database.Migrate();
+            }
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred while migrating the database.");
+        }
+    }
+
+    app.Run();
+}
+catch(Exception ex)
+{
+
+}

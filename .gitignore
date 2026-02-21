@@ -1,0 +1,10 @@
+docker-compose.yml
+.env
+.DS_Store
+*.swp
+[Dd]ebug/
+[Rr]elease/
+bin/
+obj/
+node_modules/
+dist/

@@ -9,13 +9,16 @@ import { routes } from './app.routes';
 import { ServiceProxyModule } from '../service-proxies/service-proxy.module';
 import { AuthInterceptor } from './services/auth.interceptor';
 
+import { environment } from '../environments/environment';
+
 export function getRemoteServiceBaseUrl(): string {
-  return 'https://examease.tryasp.net';
+  return environment.apiUrl;
 }
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }), 
+    provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideAnimationsAsync(),
     { provide: API_BASE_URL, useFactory: getRemoteServiceBaseUrl },
