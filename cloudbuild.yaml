@@ -47,6 +47,9 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
+      - '--port'
+      - '80'
+
 
 images:
   - 'gcr.io/$PROJECT_ID/examease-backend'
