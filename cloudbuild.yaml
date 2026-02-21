@@ -51,3 +51,7 @@ steps:
 images:
   - 'gcr.io/$PROJECT_ID/examease-backend'
   - 'gcr.io/$PROJECT_ID/examease-frontend'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
